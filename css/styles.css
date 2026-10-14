@@ -194,6 +194,7 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
 .btn-eval[data-q="3"]:hover { border-color: var(--ok); }
 .btn-eval:hover { filter: brightness(1.1); }
 .mini { color: var(--texto-tenue); font-size: 0.85rem; }
+.fc-narracion { font-style: italic; color: var(--texto); font-size: 0.95rem; margin: 2px 0 10px; }
 .link-reset { display: block; margin: 4px auto; background: none; border: none; color: var(--texto-tenue); text-decoration: underline; cursor: pointer; font-size: 0.82rem; }
 
 /* ---- Referencia / Ajustes ---- */

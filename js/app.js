@@ -327,6 +327,8 @@ function pintarFlashcard() {
 
 function voltearFlashcard() {
   const s = sintesisCarta(fcActual);
+  const det = DETALLE[fcActual.id];
+  $("fc-narracion").textContent = det ? det.general : "";
   $("fc-formula").textContent = s.formula;
   $("fc-grado").textContent = "Grado: " + s.grado;
   $("fc-elem").textContent = s.elemento;
