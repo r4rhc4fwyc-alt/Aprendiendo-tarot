@@ -166,8 +166,10 @@ function enlacesCarta(carta) {
 
 let detalleAbierto = false;
 
-function renderDetalle(carta, inv) {
-  const cont = $("c-det-contenido");
+function renderDetalle(carta, inv, idCont, idLinks) {
+  idCont = idCont || "c-det-contenido";
+  idLinks = idLinks || "c-det-links";
+  const cont = $(idCont);
   const d = DETALLE[carta.id];
   if (d) {
     const palo = PALOS[carta.palo], elem = ELEMENTOS[palo.elemento];
@@ -192,58 +194,67 @@ function renderDetalle(carta, inv) {
     cont.innerHTML = `<p class="mini">La ficha detallada de esta carta llegará pronto. Por ahora, el palo de <strong>Copas</strong> está completo como muestra; los demás se irán añadiendo con el mismo estilo.</p>`;
   }
   const e = enlacesCarta(carta);
-  $("c-det-links").innerHTML =
+  $(idLinks).innerHTML =
     `<a href="${e.labyrinthos}" target="_blank" rel="noopener">Más información · Labyrinthos ↗</a>` +
     `<a href="${e.biddy}" target="_blank" rel="noopener">Más información · Biddy Tarot ↗</a>`;
 }
 
-/* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas
-   inv = true hace que la carta salga invertida. */
-let animando = false;
-function animarYSacar(carta, inv) {
-  if (animando) return;
-  animando = true;
-  cartaActual = carta;
-  orientacionInv = !!inv;
-  const c3d = $("carta3d"), mazo = $("mazo");
+/* Animación genérica del mazo: barajar -> sacar -> voltear -> onReveal.
+   ids: { mazo, carta3d, img, nombre }  estado: { animando } */
+function animarMazo(ids, carta, inv, estado, onReveal) {
+  if (estado.animando) return;
+  estado.animando = true;
+  const c3d = $(ids.carta3d), mazo = $(ids.mazo);
 
   c3d.classList.add("oculto");
   c3d.classList.remove("volteada");
-  $("c-preguntas").classList.add("oculto");
-  $("c-revelacion").classList.add("oculto");
-  $("c-orientacion").classList.add("oculto");
-  $("c-nombre").textContent = "Barajando…";
-
-  // sincroniza el selector con la carta mostrada
-  $("sel-palo").value = carta.palo;
-  $("sel-rango").value = carta.tipo === "numero" ? String(carta.num) : carta.rango;
+  if (ids.nombre) $(ids.nombre).textContent = "Barajando…";
 
   mazo.classList.remove("barajando");
   void mazo.offsetWidth;
   mazo.classList.add("barajando");
 
   setTimeout(() => {
-    const img = $("c-img");
+    const img = $(ids.img);
     img.src = imagenCarta(carta);
     img.alt = nombreCarta(carta);
-    img.classList.toggle("invertida", orientacionInv);
+    img.classList.toggle("invertida", !!inv);
     c3d.classList.remove("oculto");
     c3d.style.animation = "none"; void c3d.offsetWidth; c3d.style.animation = "";
-    $("c-nombre").textContent = "…";
+    if (ids.nombre) $(ids.nombre).textContent = "…";
     setTimeout(() => {
       c3d.classList.add("volteada");
       setTimeout(() => {
-        $("c-nombre").textContent = nombreCarta(carta);
-        actualizarBadge();
-        $("c-orientacion").classList.remove("oculto");
-        renderDetalle(carta, orientacionInv);
-        $("c-detalle").classList.remove("oculto");
-        montarPreguntas(carta, orientacionInv);
-        $("c-preguntas").classList.remove("oculto");
-        animando = false;
+        estado.animando = false;
+        if (onReveal) onReveal();
       }, 620);
     }, 720);
   }, 820);
+}
+
+/* --- Construir: sacar carta con animación --- */
+const estadoC = { animando: false };
+function animarYSacar(carta, inv) {
+  if (estadoC.animando) return;
+  cartaActual = carta;
+  orientacionInv = !!inv;
+  $("c-preguntas").classList.add("oculto");
+  $("c-revelacion").classList.add("oculto");
+  $("c-orientacion").classList.add("oculto");
+  // sincroniza el selector con la carta mostrada
+  $("sel-palo").value = carta.palo;
+  $("sel-rango").value = carta.tipo === "numero" ? String(carta.num) : carta.rango;
+
+  animarMazo({ mazo: "mazo", carta3d: "carta3d", img: "c-img", nombre: "c-nombre" },
+    carta, orientacionInv, estadoC, () => {
+      $("c-nombre").textContent = nombreCarta(carta);
+      actualizarBadge();
+      $("c-orientacion").classList.remove("oculto");
+      renderDetalle(carta, orientacionInv, "c-det-contenido", "c-det-links");
+      $("c-detalle").classList.remove("oculto");
+      montarPreguntas(carta, orientacionInv);
+      $("c-preguntas").classList.remove("oculto");
+    });
 }
 
 function cartaAzar() {
@@ -267,7 +278,7 @@ $("sel-practicar").addEventListener("click", () => animarYSacar(cartaDesdeSelect
 
 // El botón "Barajar" no saca la carta: resalta el mazo para invitar a tocarlo
 $("sel-azar").addEventListener("click", () => {
-  if (animando) return;
+  if (estadoC.animando) return;
   const mazo = $("mazo");
   mazo.scrollIntoView({ behavior: "smooth", block: "center" });
   mazo.classList.remove("senalar");
@@ -288,11 +299,11 @@ $("c-invertir").addEventListener("click", () => {
   // si la síntesis ya estaba revelada, mantenla visible y actualizada
   if (sintesisVisible) revelarConstruir();
   // actualiza la ficha detallada a la nueva orientación
-  renderDetalle(cartaActual, orientacionInv);
+  renderDetalle(cartaActual, orientacionInv, "c-det-contenido", "c-det-links");
 });
 
 // Tocar el mazo para barajar y sacar una carta al azar
-$("mazo").addEventListener("click", () => { if (!animando) cartaAzar(); });
+$("mazo").addEventListener("click", () => { if (!estadoC.animando) cartaAzar(); });
 
 // Abrir la carta a pantalla completa (al tocar la carta revelada)
 $("carta3d").addEventListener("click", (e) => {
@@ -336,18 +347,30 @@ function elegirFlashcard() {
   return mejor || baraja[0];
 }
 
+const estadoF = { animando: false };
+
+function actualizarProgresoFC() {
+  const baraja = barajaActiva();
+  const estudiadas = Object.keys(srs).filter((id) => baraja.some((c) => c.id === id)).length;
+  $("fc-progreso").textContent = `Vistas: ${estudiadas} / ${baraja.length} cartas`;
+}
+
+/* Saca la siguiente flashcard con la animación del mazo (muestra la cara). */
 function pintarFlashcard() {
   fcActual = elegirFlashcard();
-  $("fc-img").src = imagenCarta(fcActual);
-  $("fc-img").alt = nombreCarta(fcActual);
-  $("fc-nombre").textContent = nombreCarta(fcActual);
+  actualizarProgresoFC();
+  // oculta todo lo del reverso mientras baraja
   $("fc-reverso").classList.add("oculto");
-  $("fc-acciones-frente").classList.remove("oculto");
+  $("fc-acciones-frente").classList.add("oculto");
   $("fc-acciones-reverso").classList.add("oculto");
+  $("fc-detalle").classList.add("oculto");
 
-  const total = barajaActiva().length;
-  const estudiadas = Object.keys(srs).filter((id) => barajaActiva().some((c) => c.id === id)).length;
-  $("fc-progreso").textContent = `Vistas: ${estudiadas} / ${total} cartas`;
+  animarMazo({ mazo: "fc-mazo", carta3d: "fc-carta3d", img: "fc-img", nombre: "fc-nombre" },
+    fcActual, false, estadoF, () => {
+      $("fc-nombre").textContent = nombreCarta(fcActual);
+      // de momento solo el botón "Ver significado"; el significado se revela al voltear
+      $("fc-acciones-frente").classList.remove("oculto");
+    });
 }
 
 function voltearFlashcard() {
@@ -361,6 +384,9 @@ function voltearFlashcard() {
   $("fc-reverso").classList.remove("oculto");
   $("fc-acciones-frente").classList.add("oculto");
   $("fc-acciones-reverso").classList.remove("oculto");
+  // revela también la ficha detallada (colapsada)
+  renderDetalle(fcActual, false, "fc-det-contenido", "fc-det-links");
+  $("fc-detalle").classList.remove("oculto");
 }
 
 /* calidad: 0 otra vez, 1 difícil, 2 bien, 3 fácil */
@@ -388,8 +414,27 @@ document.querySelectorAll(".btn-eval").forEach((b) =>
 );
 $("fc-reset").addEventListener("click", () => {
   if (confirm("¿Borrar todo el progreso de flashcards?")) {
-    srs = {}; guardarSRS(srs); pintarFlashcard();
+    srs = {}; guardarSRS(srs); actualizarProgresoFC();
   }
+});
+
+// Tocar el mazo saca la siguiente flashcard
+$("fc-mazo").addEventListener("click", () => { if (!estadoF.animando) pintarFlashcard(); });
+
+// Tocar la carta la amplía a pantalla completa
+$("fc-carta3d").addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (fcActual && $("fc-carta3d").classList.contains("volteada")) {
+    abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), false);
+  }
+});
+
+// Desplegar / plegar la ficha detallada en flashcards
+let fcDetalleAbierto = false;
+$("fc-detalle-toggle").addEventListener("click", () => {
+  fcDetalleAbierto = !fcDetalleAbierto;
+  $("fc-detalle-cuerpo").classList.toggle("oculto", !fcDetalleAbierto);
+  $("fc-detalle-toggle").setAttribute("aria-expanded", fcDetalleAbierto ? "true" : "false");
 });
 
 /* ============================================================
@@ -472,12 +517,12 @@ function actualizarNotaAlcance() {
 $("aj-incluir-corte").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirNumeros) { e.target.checked = true; return; }
   ajustes.incluirCorte = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); pintarFlashcard();
+  actualizarNotaAlcance(); actualizarProgresoFC();
 });
 $("aj-incluir-numeros").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirCorte) { e.target.checked = true; return; }
   ajustes.incluirNumeros = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); pintarFlashcard();
+  actualizarNotaAlcance(); actualizarProgresoFC();
 });
 
 /* ============================================================
@@ -495,14 +540,9 @@ $("lightbox").addEventListener("click", cerrarLightbox);
 $("lb-cerrar").addEventListener("click", (e) => { e.stopPropagation(); cerrarLightbox(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarLightbox(); });
 
-// En flashcards, tocar la imagen la amplía
-$("fc-img").addEventListener("click", () => {
-  if (fcActual) abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), false);
-});
-
 /* ============================================================
    ARRANQUE
    ============================================================ */
 aplicarAjustesAPalos();
 poblarSelectores();
-pintarFlashcard();
+actualizarProgresoFC();

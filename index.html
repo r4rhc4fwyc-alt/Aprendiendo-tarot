@@ -100,22 +100,34 @@
 
     <!-- ====== MODO FLASHCARDS ====== -->
     <section id="vista-flashcards" class="vista">
-      <div class="panel flashcard" id="fc-panel">
+      <div class="panel mesa">
         <div class="fc-progreso" id="fc-progreso"></div>
-        <div class="fc-cara">
-          <img class="fc-img" id="fc-img" alt="carta de tarot" />
-          <div class="carta-nombre" id="fc-nombre">—</div>
-          <div class="oculto" id="fc-reverso">
-            <div class="formula" id="fc-formula"></div>
-            <p class="fc-narracion" id="fc-narracion"></p>
-            <p id="fc-grado"></p>
-            <p id="fc-elem"></p>
-            <p class="puente" id="fc-puente"></p>
+
+        <div class="mazo-zona" id="fc-mazo-zona">
+          <div class="mazo" id="fc-mazo">
+            <div class="dorso"></div><div class="dorso"></div>
+            <div class="dorso"></div><div class="dorso"></div>
+            <div class="dorso"></div>
+          </div>
+          <div class="carta3d oculto" id="fc-carta3d">
+            <div class="cara-dorso"></div>
+            <div class="cara-frente"><img id="fc-img" alt="carta de tarot" /></div>
           </div>
         </div>
-        <div class="acciones" id="fc-acciones-frente">
-          <button id="fc-voltear" class="btn-primario">Voltear 🔄</button>
+        <div class="carta-nombre" id="fc-nombre">Toca el mazo para empezar</div>
+
+        <div class="acciones oculto" id="fc-acciones-frente">
+          <button id="fc-voltear" class="btn-primario">Ver significado 🔄</button>
         </div>
+
+        <div class="revelacion oculto" id="fc-reverso">
+          <div class="formula" id="fc-formula"></div>
+          <p class="fc-narracion" id="fc-narracion"></p>
+          <p id="fc-grado"></p>
+          <p id="fc-elem"></p>
+          <p class="puente" id="fc-puente"></p>
+        </div>
+
         <div class="acciones oculto" id="fc-acciones-reverso">
           <p class="mini">¿Qué tal te fue?</p>
           <button class="btn-eval" data-q="0">Otra vez</button>
@@ -124,6 +136,18 @@
           <button class="btn-eval" data-q="3">Fácil</button>
         </div>
       </div>
+
+      <!-- Ficha detallada -->
+      <div class="panel detalle-panel oculto" id="fc-detalle">
+        <button class="detalle-toggle" id="fc-detalle-toggle" aria-expanded="false">
+          <span>📖 Conoce esta carta</span><span class="chev">▾</span>
+        </button>
+        <div class="detalle-cuerpo oculto" id="fc-detalle-cuerpo">
+          <div id="fc-det-contenido"></div>
+          <div class="detalle-links" id="fc-det-links"></div>
+        </div>
+      </div>
+
       <button id="fc-reset" class="link-reset">Reiniciar progreso de flashcards</button>
     </section>
 

@@ -193,14 +193,6 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
 }
 .btn-invertir:hover { border-color: var(--acento); }
 
-/* Imagen en flashcards */
-.fc-img {
-  width: 150px; height: 264px; object-fit: cover; display: block; margin: 0 auto 10px;
-  border-radius: 10px; border: 3px solid #d9c98a; box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-  transition: transform 0.4s ease;
-}
-.fc-img.invertida { transform: rotate(180deg); }
-.fc-img { cursor: zoom-in; }
 
 @media (prefers-reduced-motion: reduce) {
   .carta3d, .carta3d.volteada, .mazo.barajando .dorso { animation: none !important; }
@@ -362,7 +354,6 @@ h2 { letter-spacing: 0.5px; }
 
 /* La carta revelada con brillo dorado suave */
 .cara-frente { box-shadow: 0 10px 30px rgba(0,0,0,0.55), 0 0 22px rgba(233,207,130,0.25); }
-.fc-img { box-shadow: 0 8px 20px rgba(0,0,0,0.45), 0 0 18px rgba(233,207,130,0.22); }
 
 @media (prefers-reduced-motion: reduce) {
   #estrellas { opacity: 0.9; }
