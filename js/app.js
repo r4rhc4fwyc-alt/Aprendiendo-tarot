@@ -207,7 +207,6 @@ function animarYSacar(carta, inv) {
   orientacionInv = !!inv;
   const c3d = $("carta3d"), mazo = $("mazo");
 
-  $("mazo-hint").classList.add("oculto");
   c3d.classList.add("oculto");
   c3d.classList.remove("volteada");
   $("c-preguntas").classList.add("oculto");
@@ -264,8 +263,18 @@ function revelarConstruir() {
 
 $("c-revelar").addEventListener("click", revelarConstruir);
 $("c-siguiente").addEventListener("click", cartaAzar);
-$("sel-azar").addEventListener("click", cartaAzar);
 $("sel-practicar").addEventListener("click", () => animarYSacar(cartaDesdeSelector(), false));
+
+// El botón "Barajar" no saca la carta: resalta el mazo para invitar a tocarlo
+$("sel-azar").addEventListener("click", () => {
+  if (animando) return;
+  const mazo = $("mazo");
+  mazo.scrollIntoView({ behavior: "smooth", block: "center" });
+  mazo.classList.remove("senalar");
+  void mazo.offsetWidth;
+  mazo.classList.add("senalar");
+  setTimeout(() => mazo.classList.remove("senalar"), 1400);
+});
 
 // Botón para invertir/enderezar la carta manualmente
 $("c-invertir").addEventListener("click", () => {

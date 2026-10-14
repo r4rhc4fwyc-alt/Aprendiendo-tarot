@@ -89,15 +89,16 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
 .mazo:hover { transform: scale(1.03); }
 .mazo:active { transform: scale(0.98); }
 
-/* Pista sobre el mazo */
-.mazo-hint {
-  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
-  background: rgba(12, 10, 36, 0.75); color: var(--oro, #e9cf82);
-  border: 1px solid rgba(233, 207, 130, 0.3); border-radius: 999px;
-  padding: 5px 12px; font-size: 0.82rem; white-space: nowrap;
-  pointer-events: none; animation: pulso-hint 2s ease-in-out infinite;
+/* Resaltado del mazo al pulsar "Barajar" (invita a tocarlo) */
+.mazo.senalar { animation: senalar-mazo 1.4s ease; }
+@keyframes senalar-mazo {
+  0%, 100% { transform: scale(1); filter: none; }
+  15% { transform: scale(1.07); filter: drop-shadow(0 0 16px rgba(233,207,130,0.85)); }
+  30% { transform: scale(1.02) rotate(-2deg); }
+  45% { transform: scale(1.06) rotate(2deg); filter: drop-shadow(0 0 20px rgba(233,207,130,0.9)); }
+  60% { transform: scale(1.02) rotate(0); }
+  80% { transform: scale(1.05); filter: drop-shadow(0 0 14px rgba(233,207,130,0.7)); }
 }
-@keyframes pulso-hint { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
 
 /* Animación de barajado tipo riffle (cascada entre las cartas) */
 .mazo.barajando .dorso { animation: riffle 0.8s cubic-bezier(.36,.08,.3,1); }
