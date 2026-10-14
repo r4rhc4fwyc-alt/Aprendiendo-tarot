@@ -17,12 +17,12 @@
 
   function dimensionar() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    ancho = window.innerWidth;
-    alto = window.innerHeight;
+    // tamaño real del lienzo en pantalla (el CSS lo estira a todo el viewport);
+    // usar clientWidth/Height evita el desajuste por las barras de Safari.
+    ancho = canvas.clientWidth || window.innerWidth;
+    alto = canvas.clientHeight || window.innerHeight;
     canvas.width = ancho * dpr;
     canvas.height = alto * dpr;
-    canvas.style.width = ancho + "px";
-    canvas.style.height = alto + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // densidad proporcional al área (tope para móviles)
     const n = Math.min(160, Math.round((ancho * alto) / 9000));

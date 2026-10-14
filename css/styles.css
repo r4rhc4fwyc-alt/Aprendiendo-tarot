@@ -245,18 +245,22 @@ h2 { font-size: 1.1rem; color: var(--acento); border-bottom: 1px solid var(--bor
   --fuente-texto: "EB Garamond", Georgia, serif;
 }
 
-html {
-  background: radial-gradient(1100px 680px at 50% -8%, #2d2450 0%, #16122f 48%, #0b0920 100%) fixed;
+html, body {
+  /* color sólido de base: cubre siempre, sin el bug de iOS con fondos fijos */
+  background: #0b0920;
 }
 body {
-  background: transparent;
   font-family: var(--fuente-texto);
   font-size: 1.06rem;
   line-height: 1.55;
 }
 
-/* Lienzo de estrellas y viñeta */
-#estrellas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* Lienzo de estrellas: el degradado va AQUÍ (elemento fijo, que iOS sí respeta),
+   y las estrellas se pintan encima sobre lienzo transparente. */
+#estrellas {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+  background: radial-gradient(1100px 760px at 50% -6%, #2d2450 0%, #16122f 46%, #0b0920 85%);
+}
 body::before {
   content: ""; position: fixed; inset: 0; z-index: 1; pointer-events: none;
   background: radial-gradient(130% 120% at 50% 35%, transparent 55%, rgba(5,4,16,0.65) 100%);
