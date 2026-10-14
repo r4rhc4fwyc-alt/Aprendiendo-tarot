@@ -151,6 +151,52 @@ function actualizarBadge() {
   $("c-badge").classList.toggle("inv", orientacionInv);
 }
 
+/* --- Enlaces externos "Más información" por carta --- */
+const PALABRA_RANGO = { 1: "ace", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten", paje: "page", caballero: "knight", reina: "queen", rey: "king" };
+const PALO_WORD = { bastos: "wands", copas: "cups", espadas: "swords", oros: "pentacles" };
+
+function enlacesCarta(carta) {
+  const suit = PALO_WORD[carta.palo];
+  const rango = carta.tipo === "numero" ? PALABRA_RANGO[carta.num] : PALABRA_RANGO[carta.rango];
+  return {
+    biddy: `https://www.biddytarot.com/tarot-card-meanings/minor-arcana/suit-of-${suit}/${rango}-of-${suit}/`,
+    labyrinthos: `https://labyrinthos.co/blogs/tarot-card-meanings-list/tagged/${suit}`,
+  };
+}
+
+let detalleAbierto = false;
+
+function renderDetalle(carta, inv) {
+  const cont = $("c-det-contenido");
+  const d = DETALLE[carta.id];
+  if (d) {
+    const palo = PALOS[carta.palo], elem = ELEMENTOS[palo.elemento];
+    const sig = inv ? d.esoterico.invertido : d.esoterico.derecho;
+    const rango = carta.tipo === "numero"
+      ? (carta.num === 1 ? "As (1)" : carta.num)
+      : CORTE[carta.rango].nombre.split(" / ")[0];
+    cont.innerHTML = `
+      <p class="det-general">${d.general}</p>
+      <h4>🎴 La escena</h4><p>${d.simbolismo}</p>
+      <h4>🔮 Lectura ${inv ? "(invertida)" : "(al derecho)"}</h4><p>${sig}</p>
+      <h4>🧭 Correspondencias</h4>
+      <ul class="det-corr">
+        <li><b>Elemento:</b> ${elem.nombre} ${elem.emoji}</li>
+        <li><b>Número / Rango:</b> ${rango}</li>
+        <li><b>Planeta:</b> ${d.correspondencias.planeta}</li>
+        <li><b>Signo:</b> ${d.correspondencias.signo}</li>
+        ${d.correspondencias.decanato ? `<li><b>Matiz:</b> ${d.correspondencias.decanato}</li>` : ""}
+      </ul>
+      <h4>✨ Lo que la hace única</h4><p>${d.particularidad}</p>`;
+  } else {
+    cont.innerHTML = `<p class="mini">La ficha detallada de esta carta llegará pronto. Por ahora, el palo de <strong>Copas</strong> está completo como muestra; los demás se irán añadiendo con el mismo estilo.</p>`;
+  }
+  const e = enlacesCarta(carta);
+  $("c-det-links").innerHTML =
+    `<a href="${e.labyrinthos}" target="_blank" rel="noopener">Más información · Labyrinthos ↗</a>` +
+    `<a href="${e.biddy}" target="_blank" rel="noopener">Más información · Biddy Tarot ↗</a>`;
+}
+
 /* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas
    inv = true hace que la carta salga invertida. */
 function animarYSacar(carta, inv) {
@@ -187,6 +233,8 @@ function animarYSacar(carta, inv) {
         $("c-nombre").textContent = nombreCarta(carta);
         actualizarBadge();
         $("c-orientacion").classList.remove("oculto");
+        renderDetalle(carta, orientacionInv);
+        $("c-detalle").classList.remove("oculto");
         montarPreguntas(carta, orientacionInv);
         $("c-preguntas").classList.remove("oculto");
       }, 620);
@@ -225,6 +273,15 @@ $("c-invertir").addEventListener("click", () => {
   montarPreguntas(cartaActual, orientacionInv);
   // si la síntesis ya estaba revelada, mantenla visible y actualizada
   if (sintesisVisible) revelarConstruir();
+  // actualiza la ficha detallada a la nueva orientación
+  renderDetalle(cartaActual, orientacionInv);
+});
+
+// Desplegar / plegar la ficha detallada
+$("c-detalle-toggle").addEventListener("click", () => {
+  detalleAbierto = !detalleAbierto;
+  $("c-detalle-cuerpo").classList.toggle("oculto", !detalleAbierto);
+  $("c-detalle-toggle").setAttribute("aria-expanded", detalleAbierto ? "true" : "false");
 });
 
 /* ============================================================
