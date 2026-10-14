@@ -21,8 +21,38 @@
   <main>
     <!-- ====== MODO CONSTRUIR ====== -->
     <section id="vista-construir" class="vista activa">
-      <div class="panel carta-foco">
-        <div class="carta-nombre" id="c-nombre">—</div>
+
+      <!-- Selector de carta -->
+      <div class="panel selector">
+        <h3 class="sel-titulo">Elige una carta o saca una al azar</h3>
+        <div class="sel-fila">
+          <select id="sel-palo" class="sel-elem"></select>
+          <select id="sel-rango" class="sel-elem"></select>
+          <button id="sel-practicar" class="btn-secundario">Practicar esta</button>
+        </div>
+        <button id="sel-azar" class="btn-primario btn-ancho">🎴 Barajar y sacar al azar</button>
+      </div>
+
+      <!-- Zona del mazo y la carta -->
+      <div class="panel mesa">
+        <div class="mazo-zona" id="mazo-zona">
+          <!-- mazo apilado -->
+          <div class="mazo" id="mazo">
+            <div class="dorso"></div><div class="dorso"></div>
+            <div class="dorso"></div><div class="dorso"></div>
+            <div class="dorso"></div>
+          </div>
+          <!-- carta sacada (flip) -->
+          <div class="carta3d oculto" id="carta3d">
+            <div class="cara-dorso"></div>
+            <div class="cara-frente"><img id="c-img" alt="carta de tarot" /></div>
+          </div>
+        </div>
+        <div class="carta-nombre" id="c-nombre">Saca una carta para empezar</div>
+      </div>
+
+      <!-- Preguntas (ocultas hasta sacar carta) -->
+      <div class="panel preguntas-panel oculto" id="c-preguntas">
         <p class="instruccion">Elige el significado del <strong>grado</strong> y del <strong>elemento</strong>. Luego revela la síntesis.</p>
 
         <div class="pregunta">
@@ -44,7 +74,7 @@
 
         <div class="acciones">
           <button id="c-revelar" class="btn-primario">Revelar síntesis</button>
-          <button id="c-siguiente" class="btn-secundario">Otra carta →</button>
+          <button id="c-siguiente" class="btn-secundario">Otra al azar →</button>
         </div>
       </div>
     </section>

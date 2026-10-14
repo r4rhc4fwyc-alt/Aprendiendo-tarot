@@ -99,6 +99,18 @@ const CORTE = {
 
 const RANGOS_CORTE = ["paje", "caballero", "reina", "rey"];
 
+/* --- Mapeo a las imágenes del mazo Rider-Waite-Smith (dominio público) ---
+   Archivos en img/cards/ con nombres tipo Cups01.png ... Wands14.png
+   (11 = Paje, 12 = Caballero, 13 = Reina, 14 = Rey). */
+const PALO_IMG = { bastos: "Wands", copas: "Cups", espadas: "Swords", oros: "Pentacles" };
+const CORTE_NUM = { paje: 11, caballero: 12, reina: 13, rey: 14 };
+
+function imagenCarta(carta) {
+  const prefijo = PALO_IMG[carta.palo];
+  const n = carta.tipo === "numero" ? carta.num : CORTE_NUM[carta.rango];
+  return `img/cards/${prefijo}${String(n).padStart(2, "0")}.png`;
+}
+
 /* --- GENERADOR: construye las 56 cartas --- */
 function construirBaraja() {
   const baraja = [];

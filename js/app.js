@@ -116,17 +116,78 @@ function pintarOpciones(contenedor, opciones) {
   });
 }
 
-function nuevaCartaConstruir() {
-  const baraja = barajaActiva();
-  cartaActual = baraja[Math.floor(Math.random() * baraja.length)];
-  $("c-nombre").textContent = nombreCarta(cartaActual);
+/* Rellena los dos selectores (palo + número/rango) */
+function poblarSelectores() {
+  const sp = $("sel-palo");
+  sp.innerHTML = "";
+  for (const id of Object.keys(PALOS)) {
+    const o = document.createElement("option");
+    o.value = id; o.textContent = `${PALOS[id].emoji} ${PALOS[id].nombre}`;
+    sp.appendChild(o);
+  }
+  const sr = $("sel-rango");
+  sr.innerHTML = "";
+  const add = (v, t) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sr.appendChild(o); };
+  add("1", "As");
+  for (let n = 2; n <= 10; n++) add(String(n), String(n));
+  add("paje", "Paje"); add("caballero", "Caballero"); add("reina", "Reina"); add("rey", "Rey");
+}
 
+function cartaDesdeSelector() {
+  const palo = $("sel-palo").value;
+  const r = $("sel-rango").value;
+  if (RANGOS_CORTE.includes(r)) return { id: `${palo}-${r}`, palo, tipo: "corte", rango: r };
+  return { id: `${palo}-${r}`, palo, tipo: "numero", num: parseInt(r, 10) };
+}
+
+function montarPreguntas(carta) {
   const gc = $("c-op-grado"), ec = $("c-op-elem");
   delete gc.dataset.resuelto; delete ec.dataset.resuelto;
-  pintarOpciones(gc, opcionesGrado(cartaActual));
-  pintarOpciones(ec, opcionesElemento(cartaActual));
-
+  pintarOpciones(gc, opcionesGrado(carta));
+  pintarOpciones(ec, opcionesElemento(carta));
   $("c-revelacion").classList.add("oculto");
+}
+
+/* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas */
+function animarYSacar(carta) {
+  cartaActual = carta;
+  const c3d = $("carta3d"), mazo = $("mazo");
+
+  c3d.classList.add("oculto");
+  c3d.classList.remove("volteada");
+  $("c-preguntas").classList.add("oculto");
+  $("c-revelacion").classList.add("oculto");
+  $("c-nombre").textContent = "Barajando…";
+
+  // sincroniza el selector con la carta mostrada
+  $("sel-palo").value = carta.palo;
+  $("sel-rango").value = carta.tipo === "numero" ? String(carta.num) : carta.rango;
+
+  mazo.classList.remove("barajando");
+  void mazo.offsetWidth;
+  mazo.classList.add("barajando");
+
+  setTimeout(() => {
+    const img = $("c-img");
+    img.src = imagenCarta(carta);
+    img.alt = nombreCarta(carta);
+    c3d.classList.remove("oculto");
+    c3d.style.animation = "none"; void c3d.offsetWidth; c3d.style.animation = "";
+    $("c-nombre").textContent = "…";
+    setTimeout(() => {
+      c3d.classList.add("volteada");
+      setTimeout(() => {
+        $("c-nombre").textContent = nombreCarta(carta);
+        montarPreguntas(carta);
+        $("c-preguntas").classList.remove("oculto");
+      }, 620);
+    }, 720);
+  }, 520);
+}
+
+function cartaAzar() {
+  const baraja = barajaActiva();
+  animarYSacar(baraja[Math.floor(Math.random() * baraja.length)]);
 }
 
 function revelarConstruir() {
@@ -139,7 +200,9 @@ function revelarConstruir() {
 }
 
 $("c-revelar").addEventListener("click", revelarConstruir);
-$("c-siguiente").addEventListener("click", nuevaCartaConstruir);
+$("c-siguiente").addEventListener("click", cartaAzar);
+$("sel-azar").addEventListener("click", cartaAzar);
+$("sel-practicar").addEventListener("click", () => animarYSacar(cartaDesdeSelector()));
 
 /* ============================================================
    FLASHCARDS con repetición espaciada (SM-2 simplificado)
@@ -300,17 +363,17 @@ function actualizarNotaAlcance() {
 $("aj-incluir-corte").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirNumeros) { e.target.checked = true; return; }
   ajustes.incluirCorte = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); nuevaCartaConstruir(); pintarFlashcard();
+  actualizarNotaAlcance(); pintarFlashcard();
 });
 $("aj-incluir-numeros").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirCorte) { e.target.checked = true; return; }
   ajustes.incluirNumeros = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); nuevaCartaConstruir(); pintarFlashcard();
+  actualizarNotaAlcance(); pintarFlashcard();
 });
 
 /* ============================================================
    ARRANQUE
    ============================================================ */
 aplicarAjustesAPalos();
-nuevaCartaConstruir();
+poblarSelectores();
 pintarFlashcard();

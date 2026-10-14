@@ -43,3 +43,10 @@ de lectura.
 > Nota: la correspondencia palo↔elemento no es universal entre escuelas.
 > Por defecto se usa Bastos→Fuego, Copas→Agua, Espadas→Aire, Oros→Tierra,
 > y puedes intercambiarla desde Ajustes.
+
+## Imágenes del mazo
+
+Las 56 imágenes de los arcanos menores (`img/cards/`) son del mazo
+**Rider-Waite-Smith** (1909), ilustrado por Pamela Colman Smith, considerado de
+dominio público en muchas jurisdicciones. En el modo Construir puedes elegir una
+carta concreta o barajar y sacar una al azar, con animación de mazo y de volteo.
