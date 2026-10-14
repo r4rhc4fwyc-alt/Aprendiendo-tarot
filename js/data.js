@@ -75,26 +75,26 @@ const ELEMENTOS = {
 /* --- NÚMEROS 1–10 (numerología aplicada al tarot) ---
    'mayor' = el Arcano Mayor de ese grado, tu puente mnemotécnico. */
 const NUMEROS = {
-  1:  { nombre: "As (1)", clave: "Semilla, potencial puro, el don del elemento en estado bruto, un nuevo comienzo.", mayor: "El Mago (I)" },
-  2:  { nombre: "2", clave: "Dualidad, equilibrio, elección, el encuentro de dos fuerzas, relación.", mayor: "La Sacerdotisa (II)" },
-  3:  { nombre: "3", clave: "Crecimiento, creación, primer fruto, expansión, síntesis.", mayor: "La Emperatriz (III)" },
-  4:  { nombre: "4", clave: "Estructura, estabilidad, cimientos, orden, una pausa consolidada.", mayor: "El Emperador (IV)" },
-  5:  { nombre: "5", clave: "Conflicto, crisis, cambio, pérdida de equilibrio, desafío.", mayor: "El Sumo Sacerdote (V)" },
-  6:  { nombre: "6", clave: "Armonía recuperada, reciprocidad, equilibrio tras la crisis, dar y recibir.", mayor: "Los Enamorados (VI)" },
-  7:  { nombre: "7", clave: "Evaluación, reflexión, perseverancia, tentación o ilusión, mantener el rumbo.", mayor: "El Carro (VII)" },
-  8:  { nombre: "8", clave: "Movimiento, poder, dominio, acción decidida, resultados que avanzan.", mayor: "La Justicia (VIII)*" },
-  9:  { nombre: "9", clave: "Plenitud casi total, intensidad máxima, logro o soledad antes del cierre.", mayor: "El Ermitaño (IX)" },
-  10: { nombre: "10", clave: "Culminación, fin de ciclo, exceso o plenitud total, transición a algo nuevo.", mayor: "La Rueda de la Fortuna (X)" },
+  1:  { nombre: "As (1)", clave: "Semilla, potencial puro, el don del elemento en estado bruto, un nuevo comienzo.", claveInv: "Potencial bloqueado o pospuesto, oportunidad desaprovechada, falso comienzo.", mayor: "El Mago (I)" },
+  2:  { nombre: "2", clave: "Dualidad, equilibrio, elección, el encuentro de dos fuerzas, relación.", claveInv: "Desequilibrio, indecisión, ruptura o tensión entre las dos fuerzas.", mayor: "La Sacerdotisa (II)" },
+  3:  { nombre: "3", clave: "Crecimiento, creación, primer fruto, expansión, síntesis.", claveInv: "Crecimiento estancado, colaboración rota, planes que no cuajan.", mayor: "La Emperatriz (III)" },
+  4:  { nombre: "4", clave: "Estructura, estabilidad, cimientos, orden, una pausa consolidada.", claveInv: "Rigidez o inestabilidad, aferrarse en exceso o perder los cimientos.", mayor: "El Emperador (IV)" },
+  5:  { nombre: "5", clave: "Conflicto, crisis, cambio, pérdida de equilibrio, desafío.", claveInv: "Fin del conflicto o resistencia a soltarlo, crisis que se supera o se enquista.", mayor: "El Sumo Sacerdote (V)" },
+  6:  { nombre: "6", clave: "Armonía recuperada, reciprocidad, equilibrio tras la crisis, dar y recibir.", claveInv: "Desequilibrio en el dar y recibir, nostalgia, deudas, armonía que no llega.", mayor: "Los Enamorados (VI)" },
+  7:  { nombre: "7", clave: "Evaluación, reflexión, perseverancia, tentación o ilusión, mantener el rumbo.", claveInv: "Dudas, dispersión, rendirse o insistir en lo equivocado, la ilusión se disipa.", mayor: "El Carro (VII)" },
+  8:  { nombre: "8", clave: "Movimiento, poder, dominio, acción decidida, resultados que avanzan.", claveInv: "Poder mal usado, estancamiento, prisa o parálisis, el control se escapa.", mayor: "La Justicia (VIII)*" },
+  9:  { nombre: "9", clave: "Plenitud casi total, intensidad máxima, logro o soledad antes del cierre.", claveInv: "Intensidad vuelta hacia dentro, agotamiento, miedo o logro incompleto.", mayor: "El Ermitaño (IX)" },
+  10: { nombre: "10", clave: "Culminación, fin de ciclo, exceso o plenitud total, transición a algo nuevo.", claveInv: "Ciclo que se resiste a cerrar, exceso que colapsa, recomenzar antes de tiempo.", mayor: "La Rueda de la Fortuna (X)" },
 };
 
 /* --- CARTAS DE LA CORTE ---
    Cada rango es una "manera" de vivir el elemento del palo:
    personas, actitudes o etapas. */
 const CORTE = {
-  paje:      { nombre: "Paje / Sota", clave: "Aprendizaje, curiosidad, mensajes, el elemento recién nacido. La etapa de estudiante y las noticias.", energia: "aprender" },
-  caballero: { nombre: "Caballero",   clave: "Acción, búsqueda, movimiento, el elemento llevado al extremo. Lanzarse, perseguir, a veces en exceso.", energia: "actuar" },
-  reina:     { nombre: "Reina",       clave: "Maestría interior, encarnar y nutrir el elemento desde dentro. Madurez receptiva.", energia: "encarnar" },
-  rey:       { nombre: "Rey",         clave: "Maestría exterior, autoridad, dirigir y gobernar el elemento hacia afuera. Madurez activa.", energia: "dirigir" },
+  paje:      { nombre: "Paje / Sota", clave: "Aprendizaje, curiosidad, mensajes, el elemento recién nacido. La etapa de estudiante y las noticias.", claveInv: "Inmadurez, noticias retrasadas, bloqueo al aprender, distracción o falta de compromiso.", energia: "aprender" },
+  caballero: { nombre: "Caballero",   clave: "Acción, búsqueda, movimiento, el elemento llevado al extremo. Lanzarse, perseguir, a veces en exceso.", claveInv: "Acción descontrolada o detenida, impulsividad o parálisis, llevar el elemento a un extremo dañino.", energia: "actuar" },
+  reina:     { nombre: "Reina",       clave: "Maestría interior, encarnar y nutrir el elemento desde dentro. Madurez receptiva.", claveInv: "Maestría interior desbordada o reprimida: exceso o negación de lo que el elemento nutre.", energia: "encarnar" },
+  rey:       { nombre: "Rey",         clave: "Maestría exterior, autoridad, dirigir y gobernar el elemento hacia afuera. Madurez activa.", claveInv: "Autoridad mal ejercida: control rígido o ausente, dirigir el elemento de forma dañina.", energia: "dirigir" },
 };
 
 const RANGOS_CORTE = ["paje", "caballero", "reina", "rey"];
@@ -137,24 +137,34 @@ function nombreCarta(carta) {
   return `${CORTE[carta.rango].nombre.split(" / ")[0]} de ${palo.nombre}`;
 }
 
-/* --- Síntesis: la "fórmula" de significado de una carta --- */
-function sintesisCarta(carta) {
+/* --- Síntesis: la "fórmula" de significado de una carta ---
+   invertida = true devuelve la lectura en posición invertida. */
+function sintesisCarta(carta, invertida = false) {
   const palo = PALOS[carta.palo];
   const elem = ELEMENTOS[palo.elemento];
+  const elemTxt = `${elem.nombre} ${elem.emoji} — ${elem.frase} (${elem.palabras.join(", ")}).`;
+  const elemInv = `${elem.nombre} ${elem.emoji} — energía ${elem.frase.replace(/^lo que/, "bloqueada, en exceso o vuelta hacia dentro: lo que")}.`;
+
   if (carta.tipo === "numero") {
     const numo = NUMEROS[carta.num];
     return {
-      grado: numo.clave,
-      elemento: `${elem.nombre} ${elem.emoji} — ${elem.frase} (${elem.palabras.join(", ")}).`,
-      puente: `Puente con mayores: piensa en ${numo.mayor} teñido por ${elem.nombre}.`,
-      formula: `${numo.nombre} × ${elem.nombre}`,
+      invertida,
+      grado: invertida ? numo.claveInv : numo.clave,
+      elemento: invertida ? elemInv : elemTxt,
+      puente: invertida
+        ? `Puente con mayores: la sombra de ${numo.mayor} teñida por ${elem.nombre}.`
+        : `Puente con mayores: piensa en ${numo.mayor} teñido por ${elem.nombre}.`,
+      formula: `${numo.nombre} × ${elem.nombre}${invertida ? " ⟳ invertida" : ""}`,
     };
   }
   const c = CORTE[carta.rango];
   return {
-    grado: c.clave,
-    elemento: `${elem.nombre} ${elem.emoji} — ${elem.frase} (${elem.palabras.join(", ")}).`,
-    puente: `Una persona o actitud que ${c.energia} el elemento ${elem.nombre}.`,
-    formula: `${c.nombre.split(" / ")[0]} × ${elem.nombre}`,
+    invertida,
+    grado: invertida ? c.claveInv : c.clave,
+    elemento: invertida ? elemInv : elemTxt,
+    puente: invertida
+      ? `Una persona o actitud que ${c.energia} el elemento ${elem.nombre} de forma desequilibrada.`
+      : `Una persona o actitud que ${c.energia} el elemento ${elem.nombre}.`,
+    formula: `${c.nombre.split(" / ")[0]} × ${elem.nombre}${invertida ? " ⟳ invertida" : ""}`,
   };
 }

@@ -70,6 +70,7 @@ document.querySelectorAll(".tab").forEach((btn) => {
    MODO CONSTRUIR
    ============================================================ */
 let cartaActual = null;
+let orientacionInv = false; // ¿la carta mostrada está invertida?
 
 function opcionesGrado(carta) {
   if (carta.tipo === "numero") {
@@ -148,15 +149,23 @@ function montarPreguntas(carta) {
   $("c-revelacion").classList.add("oculto");
 }
 
-/* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas */
-function animarYSacar(carta) {
+function actualizarBadge() {
+  $("c-badge").textContent = orientacionInv ? "⟳ Invertida" : "Derecha";
+  $("c-badge").classList.toggle("inv", orientacionInv);
+}
+
+/* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas
+   inv = true hace que la carta salga invertida. */
+function animarYSacar(carta, inv) {
   cartaActual = carta;
+  orientacionInv = !!inv;
   const c3d = $("carta3d"), mazo = $("mazo");
 
   c3d.classList.add("oculto");
   c3d.classList.remove("volteada");
   $("c-preguntas").classList.add("oculto");
   $("c-revelacion").classList.add("oculto");
+  $("c-orientacion").classList.add("oculto");
   $("c-nombre").textContent = "Barajando…";
 
   // sincroniza el selector con la carta mostrada
@@ -171,6 +180,7 @@ function animarYSacar(carta) {
     const img = $("c-img");
     img.src = imagenCarta(carta);
     img.alt = nombreCarta(carta);
+    img.classList.toggle("invertida", orientacionInv);
     c3d.classList.remove("oculto");
     c3d.style.animation = "none"; void c3d.offsetWidth; c3d.style.animation = "";
     $("c-nombre").textContent = "…";
@@ -178,6 +188,8 @@ function animarYSacar(carta) {
       c3d.classList.add("volteada");
       setTimeout(() => {
         $("c-nombre").textContent = nombreCarta(carta);
+        actualizarBadge();
+        $("c-orientacion").classList.remove("oculto");
         montarPreguntas(carta);
         $("c-preguntas").classList.remove("oculto");
       }, 620);
@@ -187,11 +199,12 @@ function animarYSacar(carta) {
 
 function cartaAzar() {
   const baraja = barajaActiva();
-  animarYSacar(baraja[Math.floor(Math.random() * baraja.length)]);
+  const carta = baraja[Math.floor(Math.random() * baraja.length)];
+  animarYSacar(carta, Math.random() < 0.5); // al azar puede salir invertida
 }
 
 function revelarConstruir() {
-  const s = sintesisCarta(cartaActual);
+  const s = sintesisCarta(cartaActual, orientacionInv);
   $("c-formula").textContent = s.formula;
   $("c-r-grado").textContent = s.grado;
   $("c-r-elem").textContent = s.elemento;
@@ -202,7 +215,17 @@ function revelarConstruir() {
 $("c-revelar").addEventListener("click", revelarConstruir);
 $("c-siguiente").addEventListener("click", cartaAzar);
 $("sel-azar").addEventListener("click", cartaAzar);
-$("sel-practicar").addEventListener("click", () => animarYSacar(cartaDesdeSelector()));
+$("sel-practicar").addEventListener("click", () => animarYSacar(cartaDesdeSelector(), false));
+
+// Botón para invertir/enderezar la carta manualmente
+$("c-invertir").addEventListener("click", () => {
+  if (!cartaActual) return;
+  orientacionInv = !orientacionInv;
+  $("c-img").classList.toggle("invertida", orientacionInv);
+  actualizarBadge();
+  // si ya se había revelado la síntesis, re-renderiza con la nueva orientación
+  if (!$("c-revelacion").classList.contains("oculto")) revelarConstruir();
+});
 
 /* ============================================================
    FLASHCARDS con repetición espaciada (SM-2 simplificado)
@@ -233,6 +256,8 @@ function elegirFlashcard() {
 
 function pintarFlashcard() {
   fcActual = elegirFlashcard();
+  $("fc-img").src = imagenCarta(fcActual);
+  $("fc-img").alt = nombreCarta(fcActual);
   $("fc-nombre").textContent = nombreCarta(fcActual);
   $("fc-reverso").classList.add("oculto");
   $("fc-acciones-frente").classList.remove("oculto");
