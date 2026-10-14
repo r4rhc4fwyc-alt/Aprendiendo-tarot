@@ -70,8 +70,8 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
 .mazo { position: relative; width: 150px; height: 264px; }
 .dorso, .cara-dorso {
   border-radius: 12px;
-  background: #0c0a24 url("../img/dorso.svg") center/cover no-repeat;
-  border: 3px solid #d9c98a;
+  background: #0c0a24 url("../img/dorso-mazo.jpg") center/cover no-repeat;
+  border: 2px solid #d9c98a;
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
 }
 .dorso {
