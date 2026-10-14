@@ -51,6 +51,7 @@
             <div class="cara-dorso"></div>
             <div class="cara-frente"><img id="c-img" alt="carta de tarot" /></div>
           </div>
+          <div class="mazo-hint" id="mazo-hint">👆 Toca el mazo para barajar</div>
         </div>
         <div class="carta-nombre" id="c-nombre">Saca una carta para empezar</div>
         <div class="orientacion oculto" id="c-orientacion">
@@ -158,6 +159,14 @@
   <footer class="pie">
     <p>Hecho para practicar. Las correspondencias de elementos varían entre escuelas — ajústalas a tu sistema.</p>
   </footer>
+
+  <!-- Visor a pantalla completa -->
+  <div class="lightbox oculto" id="lightbox" role="dialog" aria-modal="true">
+    <button class="lb-cerrar" id="lb-cerrar" aria-label="Cerrar">✕</button>
+    <img id="lb-img" alt="carta de tarot a pantalla completa" />
+    <div class="lb-nombre" id="lb-nombre"></div>
+    <div class="lb-pista">Toca para cerrar</div>
+  </div>
 
   <script src="js/estrellas.js"></script>
   <script src="js/data.js"></script>

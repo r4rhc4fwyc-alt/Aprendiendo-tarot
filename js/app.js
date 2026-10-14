@@ -199,11 +199,15 @@ function renderDetalle(carta, inv) {
 
 /* Secuencia: barajar -> sacar -> voltear -> mostrar preguntas
    inv = true hace que la carta salga invertida. */
+let animando = false;
 function animarYSacar(carta, inv) {
+  if (animando) return;
+  animando = true;
   cartaActual = carta;
   orientacionInv = !!inv;
   const c3d = $("carta3d"), mazo = $("mazo");
 
+  $("mazo-hint").classList.add("oculto");
   c3d.classList.add("oculto");
   c3d.classList.remove("volteada");
   $("c-preguntas").classList.add("oculto");
@@ -237,9 +241,10 @@ function animarYSacar(carta, inv) {
         $("c-detalle").classList.remove("oculto");
         montarPreguntas(carta, orientacionInv);
         $("c-preguntas").classList.remove("oculto");
+        animando = false;
       }, 620);
     }, 720);
-  }, 520);
+  }, 820);
 }
 
 function cartaAzar() {
@@ -275,6 +280,17 @@ $("c-invertir").addEventListener("click", () => {
   if (sintesisVisible) revelarConstruir();
   // actualiza la ficha detallada a la nueva orientación
   renderDetalle(cartaActual, orientacionInv);
+});
+
+// Tocar el mazo para barajar y sacar una carta al azar
+$("mazo").addEventListener("click", () => { if (!animando) cartaAzar(); });
+
+// Abrir la carta a pantalla completa (al tocar la carta revelada)
+$("carta3d").addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (cartaActual && $("carta3d").classList.contains("volteada")) {
+    abrirLightbox(imagenCarta(cartaActual), nombreCarta(cartaActual), orientacionInv);
+  }
 });
 
 // Desplegar / plegar la ficha detallada
@@ -453,6 +469,26 @@ $("aj-incluir-numeros").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirCorte) { e.target.checked = true; return; }
   ajustes.incluirNumeros = e.target.checked; guardarAjustes(ajustes);
   actualizarNotaAlcance(); pintarFlashcard();
+});
+
+/* ============================================================
+   VISOR A PANTALLA COMPLETA (lightbox)
+   ============================================================ */
+function abrirLightbox(src, nombre, inv) {
+  $("lb-img").src = src;
+  $("lb-img").classList.toggle("invertida", !!inv);
+  $("lb-nombre").textContent = nombre + (inv ? " ⟳ invertida" : "");
+  $("lightbox").classList.remove("oculto");
+}
+function cerrarLightbox() { $("lightbox").classList.add("oculto"); }
+
+$("lightbox").addEventListener("click", cerrarLightbox);
+$("lb-cerrar").addEventListener("click", (e) => { e.stopPropagation(); cerrarLightbox(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarLightbox(); });
+
+// En flashcards, tocar la imagen la amplía
+$("fc-img").addEventListener("click", () => {
+  if (fcActual) abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), false);
 });
 
 /* ============================================================

@@ -84,17 +84,62 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
 .mazo .dorso:nth-child(4) { transform: translate(3px, 3px); }
 .mazo .dorso:nth-child(5) { transform: translate(6px, 6px); }
 
-/* Animación de barajar */
-.mazo.barajando .dorso:nth-child(odd)  { animation: barajar-izq 0.5s ease; }
-.mazo.barajando .dorso:nth-child(even) { animation: barajar-der 0.5s ease; }
-@keyframes barajar-izq {
-  0%,100% { transform: translate(0,0) rotate(0); }
-  50% { transform: translate(-40px, -8px) rotate(-8deg); }
+/* Mazo clicable */
+.mazo { cursor: pointer; transition: transform 0.18s ease; }
+.mazo:hover { transform: scale(1.03); }
+.mazo:active { transform: scale(0.98); }
+
+/* Pista sobre el mazo */
+.mazo-hint {
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  background: rgba(12, 10, 36, 0.75); color: var(--oro, #e9cf82);
+  border: 1px solid rgba(233, 207, 130, 0.3); border-radius: 999px;
+  padding: 5px 12px; font-size: 0.82rem; white-space: nowrap;
+  pointer-events: none; animation: pulso-hint 2s ease-in-out infinite;
 }
-@keyframes barajar-der {
-  0%,100% { transform: translate(0,0) rotate(0); }
-  50% { transform: translate(40px, 8px) rotate(8deg); }
+@keyframes pulso-hint { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
+
+/* Animación de barajado tipo riffle (cascada entre las cartas) */
+.mazo.barajando .dorso { animation: riffle 0.8s cubic-bezier(.36,.08,.3,1); }
+.mazo.barajando .dorso:nth-child(1) { animation-delay: 0s; }
+.mazo.barajando .dorso:nth-child(2) { animation-delay: .05s; }
+.mazo.barajando .dorso:nth-child(3) { animation-delay: .10s; }
+.mazo.barajando .dorso:nth-child(4) { animation-delay: .15s; }
+.mazo.barajando .dorso:nth-child(5) { animation-delay: .20s; }
+@keyframes riffle {
+  0%   { transform: translate(0,0) rotate(0) scale(1); }
+  18%  { transform: translate(-58px,-20px) rotate(-13deg) scale(1.04); }
+  42%  { transform: translate(34px,10px) rotate(9deg) scale(1.02); }
+  64%  { transform: translate(-20px,-6px) rotate(-5deg) scale(1.01); }
+  84%  { transform: translate(10px,3px) rotate(3deg); }
+  100% { transform: translate(0,0) rotate(0) scale(1); }
 }
+
+/* Carta revelada: clicable para ampliar */
+.carta3d.volteada { cursor: zoom-in; }
+
+/* ---- Visor a pantalla completa (lightbox) ---- */
+.lightbox {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  background: rgba(5, 4, 16, 0.93); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  cursor: zoom-out; padding: 20px; animation: aparecer 0.2s ease;
+}
+.lightbox img {
+  max-height: 82vh; max-width: 92vw; border-radius: 14px;
+  border: 3px solid var(--oro, #d9c98a);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.7), 0 0 40px rgba(233,207,130,0.3);
+  transition: transform 0.4s ease;
+}
+.lightbox img.invertida { transform: rotate(180deg); }
+.lb-nombre { font-family: var(--fuente-titulo, serif); color: var(--oro-claro, #f6e8b4); font-size: 1.3rem; letter-spacing: 1px; }
+.lb-pista { color: var(--texto-tenue); font-size: 0.85rem; }
+.lb-cerrar {
+  position: absolute; top: 14px; right: 16px; z-index: 2;
+  background: rgba(31,25,48,0.8); color: var(--texto); border: 1px solid var(--borde);
+  border-radius: 50%; width: 42px; height: 42px; font-size: 1.1rem; cursor: pointer;
+}
+.lb-cerrar:hover { border-color: var(--oro, #e9cf82); color: var(--oro, #e9cf82); }
 
 /* Carta 3D que se saca y voltea */
 .carta3d {
@@ -154,6 +199,7 @@ main { max-width: 640px; margin: 20px auto; padding: 0 16px; }
   transition: transform 0.4s ease;
 }
 .fc-img.invertida { transform: rotate(180deg); }
+.fc-img { cursor: zoom-in; }
 
 @media (prefers-reduced-motion: reduce) {
   .carta3d, .carta3d.volteada, .mazo.barajando .dorso { animation: none !important; }
