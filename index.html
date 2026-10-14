@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprendiendo los Arcanos Menores</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <h1>🌙 Arcanos Menores</h1>
+    <p class="sub">Aprende por <strong>fórmula</strong>: Número/Rango × Elemento</p>
+    <nav class="tabs">
+      <button class="tab activo" data-vista="construir">🧩 Construir</button>
+      <button class="tab" data-vista="flashcards">🎴 Flashcards</button>
+      <button class="tab" data-vista="referencia">📖 Referencia</button>
+      <button class="tab" data-vista="ajustes">⚙️ Ajustes</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ====== MODO CONSTRUIR ====== -->
+    <section id="vista-construir" class="vista activa">
+      <div class="panel carta-foco">
+        <div class="carta-nombre" id="c-nombre">—</div>
+        <p class="instruccion">Elige el significado del <strong>grado</strong> y del <strong>elemento</strong>. Luego revela la síntesis.</p>
+
+        <div class="pregunta">
+          <h3>1 · ¿Qué aporta el grado (número/rango)?</h3>
+          <div class="opciones" id="c-op-grado"></div>
+        </div>
+
+        <div class="pregunta">
+          <h3>2 · ¿Qué elemento es y qué aporta?</h3>
+          <div class="opciones" id="c-op-elem"></div>
+        </div>
+
+        <div class="revelacion oculto" id="c-revelacion">
+          <div class="formula" id="c-formula"></div>
+          <p><strong>Grado:</strong> <span id="c-r-grado"></span></p>
+          <p><strong>Elemento:</strong> <span id="c-r-elem"></span></p>
+          <p class="puente" id="c-r-puente"></p>
+        </div>
+
+        <div class="acciones">
+          <button id="c-revelar" class="btn-primario">Revelar síntesis</button>
+          <button id="c-siguiente" class="btn-secundario">Otra carta →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== MODO FLASHCARDS ====== -->
+    <section id="vista-flashcards" class="vista">
+      <div class="panel flashcard" id="fc-panel">
+        <div class="fc-progreso" id="fc-progreso"></div>
+        <div class="fc-cara">
+          <div class="carta-nombre" id="fc-nombre">—</div>
+          <div class="oculto" id="fc-reverso">
+            <div class="formula" id="fc-formula"></div>
+            <p id="fc-grado"></p>
+            <p id="fc-elem"></p>
+            <p class="puente" id="fc-puente"></p>
+          </div>
+        </div>
+        <div class="acciones" id="fc-acciones-frente">
+          <button id="fc-voltear" class="btn-primario">Voltear 🔄</button>
+        </div>
+        <div class="acciones oculto" id="fc-acciones-reverso">
+          <p class="mini">¿Qué tal te fue?</p>
+          <button class="btn-eval" data-q="0">Otra vez</button>
+          <button class="btn-eval" data-q="1">Difícil</button>
+          <button class="btn-eval" data-q="2">Bien</button>
+          <button class="btn-eval" data-q="3">Fácil</button>
+        </div>
+      </div>
+      <button id="fc-reset" class="link-reset">Reiniciar progreso de flashcards</button>
+    </section>
+
+    <!-- ====== REFERENCIA ====== -->
+    <section id="vista-referencia" class="vista">
+      <div class="panel">
+        <h2>Palos y elementos</h2>
+        <div id="ref-palos" class="grid-palos"></div>
+        <h2>Números 1–10</h2>
+        <div id="ref-numeros" class="grid-ref"></div>
+        <h2>La corte</h2>
+        <div id="ref-corte" class="grid-ref"></div>
+      </div>
+    </section>
+
+    <!-- ====== AJUSTES ====== -->
+    <section id="vista-ajustes" class="vista">
+      <div class="panel">
+        <h2>Tu sistema</h2>
+        <p class="mini">Tú lees con tu propio sistema. Aquí eliges qué elemento asignas a cada palo.
+          La correspondencia tradicional (Golden Dawn) viene por defecto, pero muchas escuelas
+          intercambian Bastos y Espadas.</p>
+        <div id="aj-palos" class="grid-ref"></div>
+        <h2>Alcance de la práctica</h2>
+        <label class="check"><input type="checkbox" id="aj-incluir-corte" checked /> Incluir cartas de la corte</label>
+        <label class="check"><input type="checkbox" id="aj-incluir-numeros" checked /> Incluir numerales (As–10)</label>
+        <p class="mini" id="aj-nota"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Hecho para practicar. Las correspondencias de elementos varían entre escuelas — ajústalas a tu sistema.</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
