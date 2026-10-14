@@ -137,6 +137,20 @@ function nombreCarta(carta) {
   return `${CORTE[carta.rango].nombre.split(" / ")[0]} de ${palo.nombre}`;
 }
 
+/* --- Texto del GRADO según orientación (misma fuente que usan las opciones) --- */
+function gradoClave(carta, invertida = false) {
+  if (carta.tipo === "numero") return invertida ? NUMEROS[carta.num].claveInv : NUMEROS[carta.num].clave;
+  return invertida ? CORTE[carta.rango].claveInv : CORTE[carta.rango].clave;
+}
+
+/* --- Etiqueta corta de un ELEMENTO según orientación (para las opciones) --- */
+function elementoOpcion(elemId, invertida = false) {
+  const e = ELEMENTOS[elemId];
+  return invertida
+    ? `${e.nombre} — ${e.frase}, pero bloqueado o en exceso`
+    : `${e.nombre} — ${e.frase}`;
+}
+
 /* --- Síntesis: la "fórmula" de significado de una carta ---
    invertida = true devuelve la lectura en posición invertida. */
 function sintesisCarta(carta, invertida = false) {

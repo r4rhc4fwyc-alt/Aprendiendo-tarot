@@ -72,27 +72,21 @@ document.querySelectorAll(".tab").forEach((btn) => {
 let cartaActual = null;
 let orientacionInv = false; // ¿la carta mostrada está invertida?
 
-function opcionesGrado(carta) {
-  if (carta.tipo === "numero") {
-    const correcta = NUMEROS[carta.num].clave;
-    const distractores = tomar(
-      Object.values(NUMEROS).filter((n) => n.clave !== correcta).map((n) => n.clave), 2
-    );
-    return mezclar([{ t: correcta, ok: true }, ...distractores.map((t) => ({ t, ok: false }))]);
-  }
-  const correcta = CORTE[carta.rango].clave;
-  const distractores = tomar(
-    Object.values(CORTE).filter((c) => c.clave !== correcta).map((c) => c.clave), 2
-  );
+function opcionesGrado(carta, inv) {
+  const correcta = gradoClave(carta, inv);
+  const pool = carta.tipo === "numero"
+    ? Object.values(NUMEROS).map((n) => (inv ? n.claveInv : n.clave))
+    : Object.values(CORTE).map((c) => (inv ? c.claveInv : c.clave));
+  const distractores = tomar(pool.filter((t) => t !== correcta), 2);
   return mezclar([{ t: correcta, ok: true }, ...distractores.map((t) => ({ t, ok: false }))]);
 }
 
-function opcionesElemento(carta) {
+function opcionesElemento(carta, inv) {
   const elemCorrecto = PALOS[carta.palo].elemento;
-  const correcta = `${ELEMENTOS[elemCorrecto].nombre} — ${ELEMENTOS[elemCorrecto].frase}`;
+  const correcta = elementoOpcion(elemCorrecto, inv);
   const otros = tomar(
     ["fuego", "agua", "aire", "tierra"].filter((e) => e !== elemCorrecto), 2
-  ).map((e) => `${ELEMENTOS[e].nombre} — ${ELEMENTOS[e].frase}`);
+  ).map((e) => elementoOpcion(e, inv));
   return mezclar([{ t: correcta, ok: true }, ...otros.map((t) => ({ t, ok: false }))]);
 }
 
@@ -141,11 +135,14 @@ function cartaDesdeSelector() {
   return { id: `${palo}-${r}`, palo, tipo: "numero", num: parseInt(r, 10) };
 }
 
-function montarPreguntas(carta) {
+function montarPreguntas(carta, inv) {
   const gc = $("c-op-grado"), ec = $("c-op-elem");
   delete gc.dataset.resuelto; delete ec.dataset.resuelto;
-  pintarOpciones(gc, opcionesGrado(carta));
-  pintarOpciones(ec, opcionesElemento(carta));
+  pintarOpciones(gc, opcionesGrado(carta, inv));
+  pintarOpciones(ec, opcionesElemento(carta, inv));
+  $("c-instruccion").innerHTML = inv
+    ? "⟳ Carta <strong>invertida</strong>: elige su significado <strong>invertido</strong>. Luego revela la síntesis."
+    : "Elige el significado del <strong>grado</strong> y del <strong>elemento</strong>. Luego revela la síntesis.";
   $("c-revelacion").classList.add("oculto");
 }
 
@@ -190,7 +187,7 @@ function animarYSacar(carta, inv) {
         $("c-nombre").textContent = nombreCarta(carta);
         actualizarBadge();
         $("c-orientacion").classList.remove("oculto");
-        montarPreguntas(carta);
+        montarPreguntas(carta, orientacionInv);
         $("c-preguntas").classList.remove("oculto");
       }, 620);
     }, 720);
@@ -223,8 +220,11 @@ $("c-invertir").addEventListener("click", () => {
   orientacionInv = !orientacionInv;
   $("c-img").classList.toggle("invertida", orientacionInv);
   actualizarBadge();
-  // si ya se había revelado la síntesis, re-renderiza con la nueva orientación
-  if (!$("c-revelacion").classList.contains("oculto")) revelarConstruir();
+  const sintesisVisible = !$("c-revelacion").classList.contains("oculto");
+  // recalcula las opciones de práctica con los significados de la nueva orientación
+  montarPreguntas(cartaActual, orientacionInv);
+  // si la síntesis ya estaba revelada, mantenla visible y actualizada
+  if (sintesisVisible) revelarConstruir();
 });
 
 /* ============================================================
