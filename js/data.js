@@ -106,12 +106,13 @@ const PALO_IMG = { bastos: "Wands", copas: "Cups", espadas: "Swords", oros: "Pen
 const CORTE_NUM = { paje: 11, caballero: 12, reina: 13, rey: 14 };
 
 function imagenCarta(carta) {
+  if (carta.tipo === "mayor") return `img/cards/Major${String(carta.n).padStart(2, "0")}.png`;
   const prefijo = PALO_IMG[carta.palo];
   const n = carta.tipo === "numero" ? carta.num : CORTE_NUM[carta.rango];
   return `img/cards/${prefijo}${String(n).padStart(2, "0")}.png`;
 }
 
-/* --- GENERADOR: construye las 56 cartas --- */
+/* --- GENERADOR: construye la baraja completa (56 menores + 22 mayores) --- */
 function construirBaraja() {
   const baraja = [];
   for (const paloId of Object.keys(PALOS)) {
@@ -124,11 +125,18 @@ function construirBaraja() {
       baraja.push({ id: `${paloId}-${rango}`, palo: paloId, tipo: "corte", rango });
     }
   }
-  return baraja; // 4 palos * (10 + 4) = 56
+  // Arcanos Mayores (0–21), si los datos están cargados
+  if (typeof MAYORES !== "undefined") {
+    for (let n = 0; n < MAYORES.length; n++) {
+      baraja.push({ id: `mayor-${n}`, tipo: "mayor", n });
+    }
+  }
+  return baraja; // 56 + 22 = 78
 }
 
 /* --- Nombre legible de una carta --- */
 function nombreCarta(carta) {
+  if (carta.tipo === "mayor") return MAYORES[carta.n].nombre;
   const palo = PALOS[carta.palo];
   if (carta.tipo === "numero") {
     const etiqueta = carta.num === 1 ? "As" : carta.num;
@@ -153,7 +161,28 @@ function elementoOpcion(elemId, invertida = false) {
 
 /* --- Síntesis: la "fórmula" de significado de una carta ---
    invertida = true devuelve la lectura en posición invertida. */
+/* --- Síntesis de un Arcano Mayor (arquetipo + viaje + numerología) --- */
+function sintesisMayor(carta, invertida = false) {
+  const m = MAYORES[carta.n];
+  const linea = lineaMayor(carta.n);
+  const red = reducirNum(carta.n);
+  const numInfo = red >= 1 && red <= 10 ? NUMEROS[red] : null;
+  const claveNum = numInfo ? numInfo.clave.split(/[,.]/)[0].toLowerCase() : "potencial puro";
+  return {
+    invertida,
+    etGrado: "Lectura",
+    grado: invertida ? m.invertido : m.derecho,
+    etElem: "Correspondencia",
+    elemento: `${m.corr} · ${LINEA_NOMBRE[linea]}`,
+    puente: carta.n === 0
+      ? "Numerología: el 0, potencial puro y sin forma, el que emprende el viaje."
+      : `Numerología: ${romanoMayor(carta.n)} (${carta.n}) → ${red} — energía del ${red}: ${claveNum}.`,
+    formula: `${romanoMayor(carta.n)} · ${m.nombre}${invertida ? " ⟳ invertida" : ""}`,
+  };
+}
+
 function sintesisCarta(carta, invertida = false) {
+  if (carta.tipo === "mayor") return sintesisMayor(carta, invertida);
   const palo = PALOS[carta.palo];
   const elem = ELEMENTOS[palo.elemento];
   const elemTxt = `${elem.nombre} ${elem.emoji} — ${elem.frase} (${elem.palabras.join(", ")}).`;
@@ -163,6 +192,7 @@ function sintesisCarta(carta, invertida = false) {
     const numo = NUMEROS[carta.num];
     return {
       invertida,
+      etGrado: "Grado", etElem: "Elemento",
       grado: invertida ? numo.claveInv : numo.clave,
       elemento: invertida ? elemInv : elemTxt,
       puente: invertida
@@ -174,6 +204,7 @@ function sintesisCarta(carta, invertida = false) {
   const c = CORTE[carta.rango];
   return {
     invertida,
+    etGrado: "Grado", etElem: "Elemento",
     grado: invertida ? c.claveInv : c.clave,
     elemento: invertida ? elemInv : elemTxt,
     puente: invertida

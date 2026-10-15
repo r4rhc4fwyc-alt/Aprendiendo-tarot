@@ -70,7 +70,17 @@ para arquitectura y convenciones.
     orientación mal = "◑ casi" (fallo en stats). `quizFase`/`quizCartaOk` llevan el
     flujo. Difícil ahora saca **50 %** invertidas (Normal ~40 %). Se retiró el señuelo
     de orientación mixta en las miniaturas (la orientación es pregunta aparte).
-18. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
+18. **Arcanos Mayores (Fase 1)** (`js/arcanos-mayores.js`): los 22 mayores con imágenes
+    RWS (`img/cards/Major00–21.png`, del mismo paquete MIT que los menores). No usan la
+    fórmula: se aprenden por **arquetipo + viaje del Loco (3 líneas de 7) + numerología**
+    (número reducido = puente con los numerales). Entran en **Adivina** (pista con
+    viaje+numerología o solo lectura en difícil; distractores cercanos por línea/número
+    reducido; 2 pasos con orientación), **Flashcards** y **Progreso** (tipo `mayor`).
+    **Construir** se queda solo con menores (`barajaConstruir()`). **Ajustes**: activar/
+    desactivar Mayores y Menores (guarda que no deje la baraja vacía). Fase 1 = palabras
+    clave + lectura corta derecho/invertido + correspondencia Golden Dawn; **falta Fase 2**
+    (fichas narradas completas como los menores) y afinar la numerología/stats por línea.
+19. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
     archivos ni dependencias, offline): barajar (riffle = ráfagas de ruido filtrado),
     voltear/revelar, acierto (arpegio mayor) y error (tono grave suave). Se disparan
     en Construir, Flashcards y Adivina. Interruptor en Ajustes (`tarot_ajustes_v1.sonido`,
@@ -92,6 +102,9 @@ para arquitectura y convenciones.
 
 ## Backlog / ideas pendientes (de dónde seguir)
 
+- **Arcanos Mayores — Fase 2**: fichas narradas completas de las 22 (general, escena,
+  lectura larga, particularidad), al nivel de los menores; desglose de Progreso por
+  línea/número reducido; posible "viaje del Loco" interactivo.
 - **Cargar el sistema propio de lectura del usuario**: sus palabras clave por
   número/palo (sustituir o complementar los textos genéricos).
 - **Zoom con dos dedos** (pinch) en el visor de pantalla completa.

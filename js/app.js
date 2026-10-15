@@ -24,6 +24,8 @@ function $(id) { return document.getElementById(id); }
 function cargarAjustes() {
   const base = {
     elementoPorPalo: {}, // override: paloId -> elementoId
+    incluirMayores: true, // Arcanos Mayores en la práctica
+    incluirMenores: true, // Arcanos Menores en la práctica
     incluirCorte: true,
     incluirNumeros: true,
     quizDificil: false,  // modo difícil de Adivina: pista = solo la lectura
@@ -48,13 +50,20 @@ function aplicarAjustesAPalos() {
   }
 }
 
-/* Baraja activa según el alcance elegido */
+/* Baraja activa según el alcance elegido (mayores + menores) */
 function barajaActiva() {
   return construirBaraja().filter((c) => {
+    if (c.tipo === "mayor") return ajustes.incluirMayores;
+    if (!ajustes.incluirMenores) return false;
     if (c.tipo === "corte") return ajustes.incluirCorte;
     if (c.tipo === "numero") return ajustes.incluirNumeros;
     return true;
   });
+}
+
+/* Baraja solo de menores (Construir enseña la fórmula número × elemento) */
+function barajaConstruir() {
+  return barajaActiva().filter((c) => c.tipo !== "mayor");
 }
 
 /* ---------- Navegación entre vistas ---------- */
@@ -165,6 +174,13 @@ const PALABRA_RANGO = { 1: "ace", 2: "two", 3: "three", 4: "four", 5: "five", 6:
 const PALO_WORD = { bastos: "wands", copas: "cups", espadas: "swords", oros: "pentacles" };
 
 function enlacesCarta(carta) {
+  if (carta.tipo === "mayor") {
+    const s = MAYOR_SLUG[carta.n];
+    return {
+      biddy: `https://www.biddytarot.com/tarot-card-meanings/major-arcana/${s}/`,
+      labyrinthos: `https://labyrinthos.co/blogs/tarot-card-meanings-list/${s}-meaning-major-arcana-tarot-card-meanings`,
+    };
+  }
   const suit = PALO_WORD[carta.palo];
   const rango = carta.tipo === "numero" ? PALABRA_RANGO[carta.num] : PALABRA_RANGO[carta.rango];
   return {
@@ -173,12 +189,40 @@ function enlacesCarta(carta) {
   };
 }
 
+/* Ficha (Fase 1) de un Arcano Mayor. */
+function renderDetalleMayor(carta, inv, cont) {
+  const m = MAYORES[carta.n];
+  const red = reducirNum(carta.n);
+  const numInfo = red >= 1 && red <= 10 ? NUMEROS[red] : null;
+  const titulo = m.claves.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(" · ");
+  cont.innerHTML = `
+    <p class="det-general">${titulo}</p>
+    <h4>🔮 Lectura ${inv ? "(invertida)" : "(al derecho)"}</h4>
+    <p>${inv ? m.invertido : m.derecho}</p>
+    <h4>🧭 Correspondencias</h4>
+    <ul class="det-corr">
+      <li><b>Arcano:</b> ${romanoMayor(carta.n)} (${carta.n})</li>
+      <li><b>Correspondencia:</b> ${m.corr}</li>
+      <li><b>El viaje:</b> ${LINEA_NOMBRE[lineaMayor(carta.n)]}</li>
+      ${carta.n === 0 ? "" : `<li><b>Numerología:</b> ${carta.n} → ${red}${numInfo ? " (" + numInfo.nombre + ")" : ""}</li>`}
+    </ul>
+    <p class="mini">Ficha narrada completa: próximamente (Fase 2).</p>`;
+}
+
 let detalleAbierto = false;
 
 function renderDetalle(carta, inv, idCont, idLinks) {
   idCont = idCont || "c-det-contenido";
   idLinks = idLinks || "c-det-links";
   const cont = $(idCont);
+  if (carta.tipo === "mayor") {
+    renderDetalleMayor(carta, inv, cont);
+    const em = enlacesCarta(carta);
+    $(idLinks).innerHTML =
+      `<a href="${em.labyrinthos}" target="_blank" rel="noopener">Más información · Labyrinthos ↗</a>` +
+      `<a href="${em.biddy}" target="_blank" rel="noopener">Más información · Biddy Tarot ↗</a>`;
+    return;
+  }
   const d = DETALLE[carta.id];
   if (d) {
     const palo = PALOS[carta.palo], elem = ELEMENTOS[palo.elemento];
@@ -281,7 +325,11 @@ function animarYSacar(carta, inv) {
 }
 
 function cartaAzar() {
-  const baraja = barajaActiva();
+  const baraja = barajaConstruir(); // Construir: solo menores (la fórmula)
+  if (!baraja.length) {
+    $("c-nombre").textContent = "Activa los Arcanos Menores en ⚙️ Ajustes para usar Construir.";
+    return;
+  }
   const carta = baraja[Math.floor(Math.random() * baraja.length)];
   animarYSacar(carta, Math.random() < 0.5); // al azar puede salir invertida
 }
@@ -404,7 +452,7 @@ function voltearFlashcard() {
   const det = DETALLE[fcActual.id];
   $("fc-narracion").textContent = det ? det.general : "";
   $("fc-formula").textContent = s.formula;
-  $("fc-grado").textContent = "Grado: " + s.grado;
+  $("fc-grado").textContent = (s.etGrado || "Grado") + ": " + s.grado;
   $("fc-elem").textContent = s.elemento;
   $("fc-puente").textContent = s.puente;
   $("fc-reverso").classList.remove("oculto");
@@ -418,7 +466,7 @@ function voltearFlashcard() {
 /* calidad: 0 otra vez, 1 difícil, 2 bien, 3 fácil */
 function evaluarFlashcard(calidad) {
   // Para estadísticas: "Bien"/"Fácil" (2-3) cuentan como dominada.
-  registrar("flashcards", { palo: fcActual.palo, tipo: fcActual.tipo, grado: gradoKey(fcActual) }, calidad >= 2);
+  registrar("flashcards", bucketsCarta(fcActual), calidad >= 2);
   const e = srs[fcActual.id] || { ef: 2.5, intervalo: 0, reps: 0 };
   if (calidad === 0) {
     e.reps = 0; e.intervalo = 0; // vuelve pronto
@@ -490,6 +538,36 @@ function pistaQuiz(carta, inv) {
   return { grado, energiaFrase, palabras: elem.palabras.join(", ") };
 }
 
+/* HTML de la pista, según el tipo de carta y el nivel de dificultad. */
+function pistaHTML(carta, inv, dificil) {
+  if (carta.tipo === "mayor") {
+    const m = MAYORES[carta.n];
+    const lectura = inv ? m.invertido : m.derecho;
+    if (dificil) {
+      return `<p><span class="quiz-et">Su lectura</span>${lectura}</p>` +
+        `<p class="quiz-dif-nota">Modo difícil: dedúcela solo por su significado.</p>`;
+    }
+    const red = reducirNum(carta.n);
+    const numInfo = red >= 1 && red <= 10 ? NUMEROS[red] : null;
+    const numTxt = carta.n === 0
+      ? "número 0: potencial puro, el que inicia el viaje"
+      : `número ${carta.n} → ${red}${numInfo ? ": " + numInfo.clave.split(/[,.]/)[0].toLowerCase() : ""}`;
+    return `<p><span class="quiz-et">El viaje · numerología</span>${LINEA_NOMBRE[lineaMayor(carta.n)]} · ${numTxt}</p>` +
+      `<p><span class="quiz-et">Su lectura</span>${lectura}</p>`;
+  }
+  // Menores
+  if (dificil) {
+    const d = DETALLE[carta.id];
+    const lectura = d ? limpiarPista(inv ? d.esoterico.invertido : d.esoterico.derecho) : "";
+    return `<p><span class="quiz-et">Su lectura</span>${lectura}</p>` +
+      `<p class="quiz-dif-nota">Modo difícil: sin pistas de elemento ni grado. Dedúcela solo por su significado.</p>`;
+  }
+  const p = pistaQuiz(carta, inv);
+  return `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
+    `<span class="quiz-palabras">(${p.palabras})</span></p>` +
+    `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
+}
+
 /* Neutraliza menciones de palo/elemento para el modo difícil
    (la lectura casi nunca los nombra; esto cubre los casos sueltos). */
 function limpiarPista(t) {
@@ -502,19 +580,25 @@ function limpiarPista(t) {
     .replace(/\b(fuego|agua|aire|tierra)\b/gi, "energía");
 }
 
-/* Elige 3 distractores "cercanos": prioriza una del mismo palo y una del
-   mismo rango/número, para que la pista de verdad ejercite la fórmula. */
+/* Elige 3 distractores "cercanos" del MISMO tipo (mayor o menor).
+   Menores: mismo palo / mismo rango. Mayores: misma línea / mismo número reducido. */
 function distractoresQuiz(correcta, baraja) {
-  const otras = baraja.filter((c) => c.id !== correcta.id);
-  const mismoPalo = mezclar(otras.filter((c) => c.palo === correcta.palo));
-  const mismoRango = mezclar(otras.filter((c) =>
-    (correcta.tipo === "numero" && c.tipo === "numero" && c.num === correcta.num) ||
-    (correcta.tipo === "corte" && c.tipo === "corte" && c.rango === correcta.rango)
-  ));
+  const esMayor = correcta.tipo === "mayor";
+  const otras = baraja.filter((c) => c.id !== correcta.id && (c.tipo === "mayor") === esMayor);
+  let cercanosA, cercanosB;
+  if (esMayor) {
+    cercanosA = mezclar(otras.filter((c) => lineaMayor(c.n) === lineaMayor(correcta.n)));
+    cercanosB = mezclar(otras.filter((c) => reducirNum(c.n) === reducirNum(correcta.n)));
+  } else {
+    cercanosA = mezclar(otras.filter((c) => c.palo === correcta.palo));
+    cercanosB = mezclar(otras.filter((c) =>
+      (correcta.tipo === "numero" && c.tipo === "numero" && c.num === correcta.num) ||
+      (correcta.tipo === "corte" && c.tipo === "corte" && c.rango === correcta.rango)));
+  }
   const elegidas = [];
   const push = (c) => { if (c && !elegidas.some((x) => x.id === c.id)) elegidas.push(c); };
-  push(mismoPalo[0]);
-  push(mismoRango[0]);
+  push(cercanosA[0]);
+  push(cercanosB[0]);
   for (const c of mezclar(otras)) { if (elegidas.length >= 3) break; push(c); }
   return elegidas.slice(0, 3);
 }
@@ -565,6 +649,8 @@ function pintarRevelacionQuiz() {
   img.alt = nombreCarta(quizActual);
   img.classList.toggle("invertida", inv);
   $("quiz-formula").textContent = s.formula;
+  $("quiz-lbl-grado").textContent = (s.etGrado || "Grado") + ":";
+  $("quiz-lbl-elem").textContent = (s.etElem || "Elemento") + ":";
   $("quiz-r-grado").textContent = s.grado;
   $("quiz-r-elem").textContent = s.elemento;
   $("quiz-r-puente").textContent = s.puente;
@@ -616,7 +702,7 @@ function elegirOrientacionQuiz(ori) {
 function finalizarQuiz(ok, cartaFueCorrecta) {
   quizFase = "resuelto";
   quizResuelto = true;
-  registrar("quiz", { palo: quizActual.palo, tipo: quizActual.tipo, grado: gradoKey(quizActual) }, ok);
+  registrar("quiz", bucketsCarta(quizActual), ok);
   quizVerInv = quizInv;
   pintarRevelacionQuiz();
   $("quiz-revelacion").classList.remove("oculto");
@@ -649,21 +735,8 @@ function nuevaQuiz() {
   quizFase = "carta";
   quizCartaOk = false;
 
-  // Sin leyenda: la inversión se comunica por la descripción y la imagen de las opciones.
-  if (ajustes.quizDificil) {
-    // Modo difícil: SOLO la lectura narrativa, sin elemento ni grado.
-    const d = DETALLE[quizActual.id];
-    const lectura = d ? limpiarPista(quizInv ? d.esoterico.invertido : d.esoterico.derecho) : "";
-    $("quiz-pista").innerHTML =
-      `<p><span class="quiz-et">Su lectura</span>${lectura}</p>` +
-      `<p class="quiz-dif-nota">Modo difícil: sin pistas de elemento ni grado. Dedúcela solo por su significado.</p>`;
-  } else {
-    const p = pistaQuiz(quizActual, quizInv);
-    $("quiz-pista").innerHTML =
-      `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
-      `<span class="quiz-palabras">(${p.palabras})</span></p>` +
-      `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
-  }
+  // Sin leyenda: la inversión se comunica por la descripción y la orientación elegida.
+  $("quiz-pista").innerHTML = pistaHTML(quizActual, quizInv, ajustes.quizDificil);
 
   // 4 cartas distintas al derecho (la orientación se decide en el paso 2).
   const opciones = [
@@ -755,6 +828,14 @@ function gradoKey(carta) {
   return carta.tipo === "numero" ? String(carta.num) : carta.rango;
 }
 
+/* Buckets de estadísticas para una carta. Los mayores (sin palo ni grado
+   de la fórmula) cuentan en general/modo/tipo; el desglose por palo/grado
+   queda para los menores. */
+function bucketsCarta(carta) {
+  if (carta.tipo === "mayor") return { tipo: "mayor" };
+  return { palo: carta.palo, tipo: carta.tipo, grado: gradoKey(carta) };
+}
+
 function bump(obj, key, ok) {
   if (key == null) return;
   const b = obj[key] || (obj[key] = { i: 0, a: 0 });
@@ -807,7 +888,7 @@ function paloLabel(k) {
   const p = PALOS[k]; if (!p) return k;
   return `${p.emoji} ${p.nombre} · ${ELEMENTOS[p.elemento].nombre}`;
 }
-const TIPO_LABEL = { numero: "Numerales (As–10)", corte: "Corte (Paje–Rey)" };
+const TIPO_LABEL = { numero: "Numerales (As–10)", corte: "Corte (Paje–Rey)", mayor: "Arcanos Mayores" };
 function tipoLabel(k) { return TIPO_LABEL[k] || k; }
 function gradoLabel(k) {
   if (CORTE[k]) return CORTE[k].nombre.split(" / ")[0];
@@ -903,6 +984,28 @@ $("stat-reset").addEventListener("click", () => {
    REFERENCIA
    ============================================================ */
 function renderReferencia() {
+  // Arcanos Mayores, agrupados por línea del viaje
+  const may = $("ref-mayores");
+  if (may) {
+    let html = "";
+    for (const linea of [0, 1, 2, 3]) {
+      const grupo = [];
+      for (let n = 0; n < MAYORES.length; n++) if (lineaMayor(n) === linea) grupo.push(n);
+      if (!grupo.length) continue;
+      html += `<h3 class="ref-linea">${LINEA_NOMBRE[linea]}</h3><div class="grid-ref">`;
+      for (const n of grupo) {
+        const m = MAYORES[n];
+        const red = reducirNum(n);
+        html += `<div class="tarjeta-ref">
+          <b>${romanoMayor(n)} · ${m.nombre}</b> — ${m.claves.join(", ")}<br>
+          <span class="mini">${m.corr}${n === 0 ? "" : ` · número ${n}→${red}`}</span>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+    may.innerHTML = html;
+  }
+
   const palos = $("ref-palos");
   palos.innerHTML = "";
   for (const id of Object.keys(PALOS)) {
@@ -963,30 +1066,52 @@ function renderAjustes() {
     cont.appendChild(d);
   }
 
+  $("aj-incluir-mayores").checked = ajustes.incluirMayores;
+  $("aj-incluir-menores").checked = ajustes.incluirMenores;
   $("aj-incluir-corte").checked = ajustes.incluirCorte;
   $("aj-incluir-numeros").checked = ajustes.incluirNumeros;
   $("aj-sonido").checked = ajustes.sonido;
+  actualizarSubMenores();
   actualizarNotaAlcance();
 }
 
-function actualizarNotaAlcance() {
-  if (!ajustes.incluirCorte && !ajustes.incluirNumeros) {
-    $("aj-nota").textContent = "⚠️ Debes incluir al menos un tipo de carta.";
-  } else {
-    $("aj-nota").textContent = `Practicando con ${barajaActiva().length} cartas.`;
-  }
+/* Las sub-opciones (corte/numerales) solo aplican si los menores están activos */
+function actualizarSubMenores() {
+  const on = ajustes.incluirMenores;
+  $("aj-incluir-corte").disabled = !on;
+  $("aj-incluir-numeros").disabled = !on;
+  const sub = document.querySelector(".aj-sub");
+  if (sub) sub.style.opacity = on ? "1" : "0.45";
 }
 
-$("aj-incluir-corte").addEventListener("change", (e) => {
-  if (!e.target.checked && !ajustes.incluirNumeros) { e.target.checked = true; return; }
-  ajustes.incluirCorte = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); actualizarProgresoFC();
-});
-$("aj-incluir-numeros").addEventListener("change", (e) => {
-  if (!e.target.checked && !ajustes.incluirCorte) { e.target.checked = true; return; }
-  ajustes.incluirNumeros = e.target.checked; guardarAjustes(ajustes);
-  actualizarNotaAlcance(); actualizarProgresoFC();
-});
+function actualizarNotaAlcance() {
+  const n = barajaActiva().length;
+  $("aj-nota").textContent = n === 0
+    ? "⚠️ Debes dejar al menos un grupo de cartas activo."
+    : `Practicando con ${n} cartas` +
+      (ajustes.incluirMayores && ajustes.incluirMenores ? " (mayores + menores)." : ".");
+}
+
+/* Cambia un interruptor de alcance; si dejaría la baraja vacía, lo revierte. */
+function aplicarAlcance(key, checked, el) {
+  const prev = ajustes[key];
+  ajustes[key] = checked;
+  if (barajaActiva().length === 0) {
+    ajustes[key] = prev;
+    el.checked = prev;
+    $("aj-nota").textContent = "⚠️ Debes dejar al menos un grupo de cartas activo.";
+    return;
+  }
+  guardarAjustes(ajustes);
+  actualizarSubMenores();
+  actualizarNotaAlcance();
+  actualizarProgresoFC();
+}
+
+$("aj-incluir-mayores").addEventListener("change", (e) => aplicarAlcance("incluirMayores", e.target.checked, e.target));
+$("aj-incluir-menores").addEventListener("change", (e) => aplicarAlcance("incluirMenores", e.target.checked, e.target));
+$("aj-incluir-corte").addEventListener("change", (e) => aplicarAlcance("incluirCorte", e.target.checked, e.target));
+$("aj-incluir-numeros").addEventListener("change", (e) => aplicarAlcance("incluirNumeros", e.target.checked, e.target));
 $("aj-sonido").addEventListener("change", (e) => {
   ajustes.sonido = e.target.checked; guardarAjustes(ajustes);
   Sonido.set(ajustes.sonido);

@@ -24,11 +24,13 @@ Rama de trabajo: `claude/kind-cannon-isjfbw`.
 index.html              Interfaz y las 6 vistas (pestañas)
 css/styles.css          Estilos (base + capa de rediseño visual al final)
 js/data.js              Datos base: palos, elementos, números, corte, imágenes, síntesis
-js/cartas-detalle.js    Fichas narradas de las 56 cartas (DETALLE)
-js/app.js               Lógica: navegación, Construir, Flashcards (SRS), Referencia, Ajustes, lightbox
+js/cartas-detalle.js    Fichas narradas de las 56 menores (DETALLE)
+js/arcanos-mayores.js   Datos de los 22 Arcanos Mayores (MAYORES, líneas, numerología)
+js/app.js               Lógica: navegación, Construir, Flashcards (SRS), Adivina, Referencia, Ajustes, lightbox
 js/sonido.js            Efectos de sonido sintetizados (Web Audio API, sin archivos)
 js/estrellas.js         Cielo estrellado animado (canvas, sin dependencias)
-img/cards/*.png         56 imágenes Rider-Waite (Cups/Wands/Swords/Pentacles 01–14; 11=Paje…14=Rey)
+img/cards/*.png         78 imágenes Rider-Waite: 56 menores (Cups/Wands/Swords/Pentacles 01–14;
+                        11=Paje…14=Rey) + 22 mayores (Major00–Major21; 08=Fuerza, 11=Justicia)
 img/dorso-mazo.jpg      Reverso del mazo (ilustración del usuario)
 PROMPT-PARA-CHATGPT.md  Especificación para reconstruir la app con otra IA
 ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
@@ -57,16 +59,32 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   Adivina) por modo/palo/grado/tipo; % general e "por tanda"; "dominas mejor / a
   reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`
   (`tarot_stats_v1`).
-- **📖 Referencia**: palos, números 1–10 y corte.
-- **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir corte y
-  numerales; interruptor de **sonido**.
+- **📖 Referencia**: **Arcanos Mayores** (el viaje del Loco en 3 líneas de siete);
+  palos, números 1–10 y corte.
+- **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir **Arcanos
+  Mayores** y **Menores** (y dentro de menores, corte y numerales); interruptor de
+  **sonido**.
+
+## Arcanos Mayores (Fase 1)
+
+- Los 22 mayores **no usan la fórmula** número×elemento (son arquetipos). Se aprenden
+  por **arquetipo + viaje del Loco + numerología** (número reducido = puente con los
+  numerales que ya se conocen). Datos en `js/arcanos-mayores.js` (`MAYORES`, con
+  `nombre`, `corr`, `claves`, `derecho`, `invertido`; helpers `romanoMayor`,
+  `lineaMayor`, `reducirNum`, `LINEA_NOMBRE`, `MAYOR_SLUG`).
+- Entran en **Adivina**, **Flashcards** y **Progreso** (tipo `mayor`); **Construir**
+  se queda **solo con menores** (`barajaConstruir()`). Correspondencias Golden Dawn
+  (RWS: VIII=Fuerza, XI=Justicia). Fase 1 = palabras clave + lectura corta; las
+  fichas narradas completas quedan para la Fase 2.
 
 ## Convenciones de datos
 
 - id de carta = `"<palo>-<rango>"`, p. ej. `"copas-7"`, `"copas-reina"`.
   Palos: `bastos, copas, espadas, oros`. Rango: `1..10` o `paje/caballero/reina/rey`.
+  Mayor: `{ id:"mayor-<n>", tipo:"mayor", n:0..21 }`.
 - `imagenCarta(carta)` mapea a `img/cards/<Prefijo><NN>.png`
-  (Bastos→Wands, Copas→Cups, Espadas→Swords, Oros→Pentacles; corte 11–14).
+  (Bastos→Wands, Copas→Cups, Espadas→Swords, Oros→Pentacles; corte 11–14);
+  los mayores a `img/cards/Major<NN>.png`.
 - `DETALLE["<id>"]` = `{ general, simbolismo, esoterico:{derecho,invertido}, correspondencias:{planeta,signo,decanato}, particularidad }`.
 - Correspondencia palo↔elemento por defecto (Golden Dawn): Bastos=Fuego, Copas=Agua,
   Espadas=Aire, Oros=Tierra (editable en Ajustes; el usuario puede usar su propio sistema).

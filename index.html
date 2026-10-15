@@ -187,8 +187,8 @@
             </div>
             <div class="quiz-rev-texto">
               <div class="formula" id="quiz-formula"></div>
-              <p><strong>Grado:</strong> <span id="quiz-r-grado"></span></p>
-              <p><strong>Elemento:</strong> <span id="quiz-r-elem"></span></p>
+              <p><strong id="quiz-lbl-grado">Grado:</strong> <span id="quiz-r-grado"></span></p>
+              <p><strong id="quiz-lbl-elem">Elemento:</strong> <span id="quiz-r-elem"></span></p>
               <p class="puente" id="quiz-r-puente"></p>
             </div>
           </div>
@@ -245,6 +245,14 @@
     <!-- ====== REFERENCIA ====== -->
     <section id="vista-referencia" class="vista">
       <div class="panel">
+        <h2>Arcanos Mayores · el viaje del Loco</h2>
+        <p class="mini">Los 22 mayores no siguen la fórmula número×elemento: son arquetipos.
+          El <strong>Loco (0)</strong> es quien hace el viaje; el resto se agrupa en
+          <strong>tres líneas de siete</strong> (consciente, subconsciente, superconsciente).
+          Cada carta trae su correspondencia y su número reducido (puente con los numerales).</p>
+        <div id="ref-mayores"></div>
+      </div>
+      <div class="panel">
         <h2>Palos y elementos</h2>
         <div id="ref-palos" class="grid-palos"></div>
         <h2>Números 1–10</h2>
@@ -263,8 +271,12 @@
           intercambian Bastos y Espadas.</p>
         <div id="aj-palos" class="grid-ref"></div>
         <h2>Alcance de la práctica</h2>
-        <label class="check"><input type="checkbox" id="aj-incluir-corte" checked /> Incluir cartas de la corte</label>
-        <label class="check"><input type="checkbox" id="aj-incluir-numeros" checked /> Incluir numerales (As–10)</label>
+        <label class="check"><input type="checkbox" id="aj-incluir-mayores" checked /> 🌙 Incluir Arcanos Mayores (22)</label>
+        <label class="check"><input type="checkbox" id="aj-incluir-menores" checked /> 🎴 Incluir Arcanos Menores (56)</label>
+        <div class="aj-sub">
+          <label class="check"><input type="checkbox" id="aj-incluir-corte" checked /> Corte (Paje–Rey)</label>
+          <label class="check"><input type="checkbox" id="aj-incluir-numeros" checked /> Numerales (As–10)</label>
+        </div>
         <p class="mini" id="aj-nota"></p>
 
         <h2>Sonido</h2>
@@ -288,6 +300,7 @@
 
   <script src="js/estrellas.js"></script>
   <script src="js/sonido.js"></script>
+  <script src="js/arcanos-mayores.js"></script>
   <script src="js/data.js"></script>
   <script src="js/cartas-detalle.js"></script>
   <script src="js/app.js"></script>
