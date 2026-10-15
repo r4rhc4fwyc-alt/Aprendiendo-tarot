@@ -405,6 +405,23 @@ h2 { letter-spacing: 0.5px; }
 
 /* Leyenda discreta de pulsación larga */
 .quiz-lp-hint { color: var(--texto-tenue); font-size: 0.78rem; text-align: center; margin: 10px 0 0; opacity: 0.8; }
+
+/* Paso 2: pregunta de orientación */
+.quiz-orient-botones { display: flex; gap: 10px; }
+.quiz-orient-op {
+  flex: 1; background: var(--bg-panel-2); color: var(--texto);
+  border: 1px solid var(--borde); border-radius: 12px;
+  padding: 14px 10px; cursor: pointer; font-size: 1rem; font-family: var(--fuente-titulo);
+  letter-spacing: 0.3px; transition: all 0.12s;
+}
+.quiz-orient-op:hover { border-color: var(--acento); transform: translateY(-2px); }
+.quiz-orient-op.correcta { border-color: var(--ok); background: #1d3a2e; }
+.quiz-orient-op.incorrecta { border-color: #d16a6a; background: #3a1d1d; }
+.quiz-orient-op.bloqueada { cursor: default; }
+.quiz-orient-op.bloqueada:hover { transform: none; }
+
+/* Marcador "casi" (carta bien, orientación mal) */
+.quiz-marcador.casi { color: var(--acento-2); }
 /* Fila de orientación dentro de la ficha de Adivina */
 .quiz-det-orient { margin: 0 0 12px; }
 

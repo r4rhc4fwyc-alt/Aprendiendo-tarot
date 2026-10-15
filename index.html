@@ -166,9 +166,18 @@
         <div class="quiz-pista" id="quiz-pista"></div>
 
         <div class="pregunta">
-          <h3>¿Qué carta describe esta energía?</h3>
+          <h3>1 · ¿Qué carta describe este significado?</h3>
           <div class="quiz-opciones" id="quiz-opciones"></div>
           <p class="quiz-lp-hint">🔍 Mantén pulsada una carta para verla a pantalla completa.</p>
+        </div>
+
+        <!-- Paso 2: orientación (aparece al acertar la carta) -->
+        <div class="pregunta quiz-orient-q oculto" id="quiz-orient-q">
+          <h3>2 · ¿Cómo cae <b id="quiz-orient-carta"></b>?</h3>
+          <div class="quiz-orient-botones">
+            <button class="quiz-orient-op" data-ori="der">Al derecho</button>
+            <button class="quiz-orient-op" data-ori="inv">⟳ Invertida</button>
+          </div>
         </div>
 
         <div class="revelacion oculto" id="quiz-revelacion">

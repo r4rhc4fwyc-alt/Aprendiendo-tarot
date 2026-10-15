@@ -64,7 +64,13 @@ para arquitectura y convenciones.
     pantalla completa (con leyenda discreta). La ficha "Conoce esta carta" trae botón
     **Invertir/Revertir** (`quizVerInv`) que voltea imagen + síntesis + lectura para
     aprender ambos significados.
-17. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
+17. **Adivina — dos pasos (acertar también la orientación)**: ahora la pregunta es en
+    dos fases: 1) elegir la carta (4 opciones al derecho), 2) elegir su orientación
+    (al derecho / invertida). Acierto solo si carta + orientación; carta bien +
+    orientación mal = "◑ casi" (fallo en stats). `quizFase`/`quizCartaOk` llevan el
+    flujo. Difícil ahora saca **50 %** invertidas (Normal ~40 %). Se retiró el señuelo
+    de orientación mixta en las miniaturas (la orientación es pregunta aparte).
+18. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
     archivos ni dependencias, offline): barajar (riffle = ráfagas de ruido filtrado),
     voltear/revelar, acierto (arpegio mayor) y error (tono grave suave). Se disparan
     en Construir, Flashcards y Adivina. Interruptor en Ajustes (`tarot_ajustes_v1.sonido`,

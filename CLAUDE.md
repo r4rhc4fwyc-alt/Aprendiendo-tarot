@@ -43,15 +43,16 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
 - **🎴 Flashcards**: mismo mazo y animación; repetición espaciada (SM-2 simplificado,
   en `localStorage`); ~35 % salen **invertidas** (muestran el significado invertido);
   "Ver significado" revela texto + la ficha; calificación.
-- **🔮 Adivina** (quiz inverso): se da el significado y se adivina entre 4 opciones
-  con miniatura; distractores "cercanos" (mismo palo / mismo rango). La inversión no
-  se anuncia con leyenda: ~40 % de objetivos son invertidos y **las opciones salen con
-  orientación mixta** (la correcta en su orientación real; si el objetivo es invertido
-  hay **≥2 opciones invertidas**). **Pulsación larga** sobre una opción = verla a
-  pantalla completa. Al responder revela la síntesis y la ficha **"Conoce esta carta"**,
-  que incluye un botón **Invertir/Revertir** para estudiar ambos significados. Dos
-  niveles: **Normal** (pista = energía del elemento + aporte del grado) y **Difícil**
-  (pista = solo la lectura narrativa, sin nombrar elemento ni grado; se guarda en Ajustes).
+- **🔮 Adivina** (quiz inverso): se da el significado y se adivina en **dos pasos**:
+  (1) elegir la **carta** entre 4 opciones al derecho (distractores "cercanos": mismo
+  palo / mismo rango); (2) elegir su **orientación** (al derecho / invertida). Solo es
+  **acierto** si se aciertan carta **y** orientación; carta correcta + orientación mal =
+  "casi" (cuenta como fallo). **Pulsación larga** sobre una opción = verla a pantalla
+  completa. Al terminar revela la síntesis y la ficha **"Conoce esta carta"**, con botón
+  **Invertir/Revertir** para estudiar ambos significados. Dos niveles: **Normal** (pista =
+  energía del elemento + aporte del grado; ~40 % objetivos invertidos) y **Difícil**
+  (pista = solo la lectura narrativa, sin nombrar elemento ni grado; 50 % invertidos;
+  se guarda en Ajustes).
 - **📊 Progreso**: estadísticas de aciertos de los 3 modos (Construir, Flashcards,
   Adivina) por modo/palo/grado/tipo; % general e "por tanda"; "dominas mejor / a
   reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`
