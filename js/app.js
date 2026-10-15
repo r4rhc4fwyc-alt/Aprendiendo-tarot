@@ -63,6 +63,7 @@ document.querySelectorAll(".tab").forEach((btn) => {
     $("vista-" + btn.dataset.vista).classList.add("activa");
     if (btn.dataset.vista === "referencia") renderReferencia();
     if (btn.dataset.vista === "ajustes") renderAjustes();
+    if (btn.dataset.vista === "quiz" && !quizActual) nuevaQuiz();
   });
 });
 
@@ -447,6 +448,120 @@ $("fc-detalle-toggle").addEventListener("click", () => {
   fcDetalleAbierto = !fcDetalleAbierto;
   $("fc-detalle-cuerpo").classList.toggle("oculto", !fcDetalleAbierto);
   $("fc-detalle-toggle").setAttribute("aria-expanded", fcDetalleAbierto ? "true" : "false");
+});
+
+/* ============================================================
+   MODO QUIZ INVERSO — se da el significado, se adivina la carta
+   ============================================================ */
+let quizActual = null;      // carta objetivo de la pregunta en curso
+let quizInv = false;        // ¿la energía descrita es la de la carta invertida?
+let quizResuelto = false;
+
+/* Construye el texto-pista SIN nombrar la carta, el palo, el elemento
+   ni el número: solo la energía del elemento y el aporte del grado.
+   Así hay que *deducir* la carta a partir de su significado. */
+function pistaQuiz(carta, inv) {
+  const palo = PALOS[carta.palo];
+  const elem = ELEMENTOS[palo.elemento];
+  const grado = carta.tipo === "numero"
+    ? (inv ? NUMEROS[carta.num].claveInv : NUMEROS[carta.num].clave)
+    : (inv ? CORTE[carta.rango].claveInv : CORTE[carta.rango].clave);
+  const energiaFrase = inv
+    ? `${elem.frase}, pero en bloqueo, exceso o vuelta hacia dentro`
+    : elem.frase;
+  return { grado, energiaFrase, palabras: elem.palabras.join(", ") };
+}
+
+/* Elige 3 distractores "cercanos": prioriza una del mismo palo y una del
+   mismo rango/número, para que la pista de verdad ejercite la fórmula. */
+function distractoresQuiz(correcta, baraja) {
+  const otras = baraja.filter((c) => c.id !== correcta.id);
+  const mismoPalo = mezclar(otras.filter((c) => c.palo === correcta.palo));
+  const mismoRango = mezclar(otras.filter((c) =>
+    (correcta.tipo === "numero" && c.tipo === "numero" && c.num === correcta.num) ||
+    (correcta.tipo === "corte" && c.tipo === "corte" && c.rango === correcta.rango)
+  ));
+  const elegidas = [];
+  const push = (c) => { if (c && !elegidas.some((x) => x.id === c.id)) elegidas.push(c); };
+  push(mismoPalo[0]);
+  push(mismoRango[0]);
+  for (const c of mezclar(otras)) { if (elegidas.length >= 3) break; push(c); }
+  return elegidas.slice(0, 3);
+}
+
+function pintarOpcionesQuiz(opciones) {
+  const cont = $("quiz-opciones");
+  cont.innerHTML = "";
+  opciones.forEach((op) => {
+    const b = document.createElement("button");
+    b.className = "quiz-opcion";
+    b.innerHTML =
+      `<img src="${imagenCarta(op.carta)}" alt="${nombreCarta(op.carta)}" />` +
+      `<span>${nombreCarta(op.carta)}</span>`;
+    b.addEventListener("click", () => responderQuiz(op, b));
+    cont.appendChild(b);
+  });
+}
+
+function responderQuiz(op, boton) {
+  if (quizResuelto) return;
+  quizResuelto = true;
+  const cont = $("quiz-opciones");
+  // marca la elegida y, siempre, la correcta
+  boton.classList.add(op.ok ? "correcta" : "incorrecta");
+  [...cont.children].forEach((b) => {
+    if (b.querySelector("span").textContent === nombreCarta(quizActual)) b.classList.add("correcta");
+    b.classList.add("bloqueada");
+  });
+  // revela la carta y su síntesis completa
+  const s = sintesisCarta(quizActual, quizInv);
+  const img = $("quiz-mini-img");
+  img.src = imagenCarta(quizActual);
+  img.alt = nombreCarta(quizActual);
+  img.classList.toggle("invertida", quizInv);
+  $("quiz-formula").textContent = s.formula;
+  $("quiz-r-grado").textContent = s.grado;
+  $("quiz-r-elem").textContent = s.elemento;
+  $("quiz-r-puente").textContent = s.puente;
+  $("quiz-revelacion").classList.remove("oculto");
+  $("quiz-marcador").textContent = op.ok
+    ? "✔ ¡Correcto! Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + "."
+    : "✘ Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + ".";
+  $("quiz-marcador").className = "quiz-marcador " + (op.ok ? "ok" : "mal");
+  asegurarVisible($("quiz-revelacion"));
+}
+
+function nuevaQuiz() {
+  const baraja = barajaActiva();
+  quizActual = baraja[Math.floor(Math.random() * baraja.length)];
+  quizInv = Math.random() < 0.4; // a veces invertida, para practicar la sombra
+  quizResuelto = false;
+
+  const p = pistaQuiz(quizActual, quizInv);
+  $("quiz-pista").innerHTML =
+    (quizInv ? `<div class="quiz-orient">⟳ Carta invertida</div>` : "") +
+    `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
+    `<span class="quiz-palabras">(${p.palabras})</span></p>` +
+    `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
+
+  const opciones = mezclar([
+    { carta: quizActual, ok: true },
+    ...distractoresQuiz(quizActual, baraja).map((c) => ({ carta: c, ok: false })),
+  ]);
+  pintarOpcionesQuiz(opciones);
+
+  $("quiz-revelacion").classList.add("oculto");
+  $("quiz-marcador").textContent = "";
+  $("quiz-marcador").className = "quiz-marcador";
+}
+
+$("quiz-siguiente").addEventListener("click", nuevaQuiz);
+
+// Tocar la carta revelada la amplía a pantalla completa
+$("quiz-mini").addEventListener("click", () => {
+  if (quizResuelto && quizActual) {
+    abrirLightbox(imagenCarta(quizActual), nombreCarta(quizActual), quizInv);
+  }
 });
 
 /* ============================================================

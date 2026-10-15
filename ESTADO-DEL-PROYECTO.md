@@ -37,6 +37,12 @@ para arquitectura y convenciones.
     carta, **la vista se desplaza al mazo** para ver la animación aunque estés leyendo
     la ficha más abajo.
 11. **PROMPT-PARA-CHATGPT.md**: especificación para regenerar la app con otra IA.
+12. **Modo quiz inverso (🔮 Adivina)**: 5ª pestaña. Se muestra el **significado**
+    (energía del elemento + aporte del grado, **sin** nombrar carta/palo/elemento/número)
+    y se adivina la carta entre 4 opciones con miniatura. Distractores "cercanos"
+    (prioriza una del mismo palo y una del mismo número/rango) para ejercitar la
+    fórmula. Incluye cartas invertidas (~40 %), respeta el alcance de Ajustes,
+    revela la síntesis completa al responder y amplía la carta en el lightbox.
 
 ## Decisiones tomadas (el "porqué")
 
@@ -59,8 +65,9 @@ para arquitectura y convenciones.
 - **Flashcards invertidas**: opción de que salgan invertidas y mostrar el significado
   invertido (ahora siempre salen al derecho).
 - **Zoom con dos dedos** (pinch) en el visor de pantalla completa.
-- **Modo quiz inverso**: dar el significado y adivinar la carta.
 - **Estadísticas de progreso**: qué palos/números se dominan.
+- **Quiz inverso — mejoras**: llevar cuenta de aciertos/racha, o integrar el
+  resultado con el SRS de flashcards.
 - **Afinar animaciones**: velocidad del barajado, entrada con brillo, etc.
 - **Anexo de datos**: `.md` con las 56 fichas completas para pegar en otra IA (pendiente,
   el usuario lo mencionó como opcional).

@@ -17,6 +17,7 @@
     <nav class="tabs">
       <button class="tab activo" data-vista="construir">🧩 Construir</button>
       <button class="tab" data-vista="flashcards">🎴 Flashcards</button>
+      <button class="tab" data-vista="quiz">🔮 Adivina</button>
       <button class="tab" data-vista="referencia">📖 Referencia</button>
       <button class="tab" data-vista="ajustes">⚙️ Ajustes</button>
     </nav>
@@ -149,6 +150,40 @@
       </div>
 
       <button id="fc-reset" class="link-reset">Reiniciar progreso de flashcards</button>
+    </section>
+
+    <!-- ====== MODO QUIZ INVERSO (adivinar la carta) ====== -->
+    <section id="vista-quiz" class="vista">
+      <div class="panel">
+        <p class="instruccion">Al revés que Construir: te damos el <strong>significado</strong> y tú adivinas <strong>qué carta es</strong>.</p>
+
+        <div class="quiz-pista" id="quiz-pista"></div>
+
+        <div class="pregunta">
+          <h3>¿Qué carta describe esta energía?</h3>
+          <div class="quiz-opciones" id="quiz-opciones"></div>
+        </div>
+
+        <div class="revelacion oculto" id="quiz-revelacion">
+          <div class="quiz-rev-carta">
+            <div class="carta3d-mini" id="quiz-mini">
+              <img id="quiz-mini-img" alt="carta de tarot" />
+            </div>
+            <div class="quiz-rev-texto">
+              <div class="formula" id="quiz-formula"></div>
+              <p><strong>Grado:</strong> <span id="quiz-r-grado"></span></p>
+              <p><strong>Elemento:</strong> <span id="quiz-r-elem"></span></p>
+              <p class="puente" id="quiz-r-puente"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-marcador" id="quiz-marcador"></div>
+
+        <div class="acciones">
+          <button id="quiz-siguiente" class="btn-primario">Otra carta →</button>
+        </div>
+      </div>
     </section>
 
     <!-- ====== REFERENCIA ====== -->

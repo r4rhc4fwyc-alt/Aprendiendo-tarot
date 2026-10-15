@@ -358,3 +358,71 @@ h2 { letter-spacing: 0.5px; }
 @media (prefers-reduced-motion: reduce) {
   #estrellas { opacity: 0.9; }
 }
+
+/* ============================================================
+   MODO QUIZ INVERSO (🔮 Adivina)
+   ============================================================ */
+.quiz-pista {
+  margin: 14px 0 6px; padding: 16px 16px 10px;
+  background: var(--bg-panel-2); border-radius: var(--radio);
+  border: 1px dashed var(--acento);
+}
+.quiz-pista p { margin: 0 0 12px; font-size: 1.02rem; }
+.quiz-pista p:last-child { margin-bottom: 4px; }
+.quiz-et {
+  display: block; font-family: var(--fuente-titulo);
+  font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--acento-2); margin-bottom: 2px;
+}
+.quiz-palabras { color: var(--texto-tenue); font-style: italic; }
+.quiz-orient {
+  display: inline-block; margin-bottom: 12px; padding: 3px 12px;
+  border: 1px solid var(--acento-2); border-radius: 999px;
+  color: var(--acento-2); font-size: 0.82rem; letter-spacing: 0.5px;
+}
+
+.quiz-opciones {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+}
+.quiz-opcion {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  background: var(--bg-panel-2); color: var(--texto);
+  border: 1px solid var(--borde); border-radius: 12px;
+  padding: 10px; cursor: pointer; transition: all 0.12s;
+}
+.quiz-opcion img {
+  width: 100%; max-width: 120px; aspect-ratio: 150 / 264;
+  object-fit: cover; border-radius: 8px;
+  border: 2px solid #d9c98a; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.quiz-opcion span {
+  font-family: var(--fuente-titulo); font-size: 0.92rem;
+  letter-spacing: 0.3px; text-align: center;
+}
+.quiz-opcion:hover { border-color: var(--acento); transform: translateY(-2px); }
+.quiz-opcion.correcta { border-color: var(--ok); background: #1d3a2e; }
+.quiz-opcion.incorrecta { border-color: #d16a6a; background: #3a1d1d; }
+.quiz-opcion.bloqueada { cursor: default; }
+.quiz-opcion.bloqueada:hover { transform: none; }
+.quiz-opcion.bloqueada:not(.correcta):not(.incorrecta) { opacity: 0.5; }
+
+/* Revelación de la carta adivinada */
+.quiz-rev-carta { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.carta3d-mini { flex: 0 0 auto; cursor: zoom-in; }
+.carta3d-mini img {
+  width: 110px; aspect-ratio: 150 / 264; object-fit: cover;
+  border-radius: 10px; border: 3px solid #d9c98a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 18px rgba(233,207,130,0.22);
+  transition: transform 0.4s ease;
+}
+.carta3d-mini img.invertida { transform: rotate(180deg); }
+.quiz-rev-texto { flex: 1; min-width: 200px; }
+.quiz-rev-texto .formula { text-align: left; }
+
+.quiz-marcador { text-align: center; font-weight: 600; margin-top: 14px; min-height: 1.2em; }
+.quiz-marcador.ok { color: var(--ok); }
+.quiz-marcador.mal { color: #e58a8a; }
+
+@media (max-width: 380px) {
+  .quiz-opcion span { font-size: 0.82rem; }
+}

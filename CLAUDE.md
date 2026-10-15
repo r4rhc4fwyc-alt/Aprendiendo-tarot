@@ -39,6 +39,10 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   solo resalta el mazo (el gesto real es tocar el mazo).
 - **🎴 Flashcards**: mismo mazo y animación; repetición espaciada (SM-2 simplificado,
   en `localStorage`); "Ver significado" revela texto + la ficha; calificación.
+- **🔮 Adivina** (quiz inverso): se da el significado (energía del elemento + aporte
+  del grado, sin nombrar la carta) y se adivina entre 4 opciones con miniatura;
+  distractores "cercanos" (mismo palo / mismo rango), ~40 % invertidas, revela la
+  síntesis al responder.
 - **📖 Referencia**: palos, números 1–10 y corte.
 - **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir corte y numerales.
 
