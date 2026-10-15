@@ -199,12 +199,24 @@ function renderDetalle(carta, inv, idCont, idLinks) {
     `<a href="${e.biddy}" target="_blank" rel="noopener">Más información · Biddy Tarot ↗</a>`;
 }
 
+/* Lleva un elemento a la vista si no está (bien) visible en pantalla */
+function asegurarVisible(el) {
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  if (r.top < 70 || r.bottom > vh - 20) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
 /* Animación genérica del mazo: barajar -> sacar -> voltear -> onReveal.
    ids: { mazo, carta3d, img, nombre }  estado: { animando } */
 function animarMazo(ids, carta, inv, estado, onReveal) {
   if (estado.animando) return;
   estado.animando = true;
   const c3d = $(ids.carta3d), mazo = $(ids.mazo);
+
+  // asegura que se vea el barajado aunque estés leyendo la ficha más abajo
+  asegurarVisible(ids.zona ? $(ids.zona) : mazo);
 
   c3d.classList.add("oculto");
   c3d.classList.remove("volteada");
@@ -245,7 +257,7 @@ function animarYSacar(carta, inv) {
   $("sel-palo").value = carta.palo;
   $("sel-rango").value = carta.tipo === "numero" ? String(carta.num) : carta.rango;
 
-  animarMazo({ mazo: "mazo", carta3d: "carta3d", img: "c-img", nombre: "c-nombre" },
+  animarMazo({ mazo: "mazo", carta3d: "carta3d", img: "c-img", nombre: "c-nombre", zona: "mazo-zona" },
     carta, orientacionInv, estadoC, () => {
       $("c-nombre").textContent = nombreCarta(carta);
       actualizarBadge();
@@ -365,7 +377,7 @@ function pintarFlashcard() {
   $("fc-acciones-reverso").classList.add("oculto");
   $("fc-detalle").classList.add("oculto");
 
-  animarMazo({ mazo: "fc-mazo", carta3d: "fc-carta3d", img: "fc-img", nombre: "fc-nombre" },
+  animarMazo({ mazo: "fc-mazo", carta3d: "fc-carta3d", img: "fc-img", nombre: "fc-nombre", zona: "fc-mazo-zona" },
     fcActual, false, estadoF, () => {
       $("fc-nombre").textContent = nombreCarta(fcActual);
       // de momento solo el botón "Ver significado"; el significado se revela al voltear
