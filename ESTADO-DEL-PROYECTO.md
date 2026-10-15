@@ -57,6 +57,13 @@ para arquitectura y convenciones.
     conmutador **Normal / Difícil**. En difícil la pista es solo la lectura narrativa
     (`esoterico`), saneada para no nombrar palo/elemento; la preferencia se guarda en
     Ajustes (`tarot_ajustes_v1.quizDificil`).
+16. **Adivina — inversión visual y estudio**: se quitó la leyenda "carta invertida";
+    la inversión se comunica por la descripción y por la **imagen de las opciones**
+    (orientación mixta; la correcta en su orientación real y, si el objetivo es
+    invertido, ≥2 opciones invertidas). **Pulsación larga** en una opción la abre a
+    pantalla completa (con leyenda discreta). La ficha "Conoce esta carta" trae botón
+    **Invertir/Revertir** (`quizVerInv`) que voltea imagen + síntesis + lectura para
+    aprender ambos significados.
 
 ## Decisiones tomadas (el "porqué")
 

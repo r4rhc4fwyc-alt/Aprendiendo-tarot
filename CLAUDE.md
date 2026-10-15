@@ -42,10 +42,14 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   en `localStorage`); ~35 % salen **invertidas** (muestran el significado invertido);
   "Ver significado" revela texto + la ficha; calificación.
 - **🔮 Adivina** (quiz inverso): se da el significado y se adivina entre 4 opciones
-  con miniatura; distractores "cercanos" (mismo palo / mismo rango), ~40 % invertidas,
-  revela la síntesis y la ficha **"Conoce esta carta"** al responder. Dos niveles:
-  **Normal** (pista = energía del elemento + aporte del grado) y **Difícil** (pista =
-  solo la lectura narrativa, sin nombrar elemento ni grado; se guarda en Ajustes).
+  con miniatura; distractores "cercanos" (mismo palo / mismo rango). La inversión no
+  se anuncia con leyenda: ~40 % de objetivos son invertidos y **las opciones salen con
+  orientación mixta** (la correcta en su orientación real; si el objetivo es invertido
+  hay **≥2 opciones invertidas**). **Pulsación larga** sobre una opción = verla a
+  pantalla completa. Al responder revela la síntesis y la ficha **"Conoce esta carta"**,
+  que incluye un botón **Invertir/Revertir** para estudiar ambos significados. Dos
+  niveles: **Normal** (pista = energía del elemento + aporte del grado) y **Difícil**
+  (pista = solo la lectura narrativa, sin nombrar elemento ni grado; se guarda en Ajustes).
 - **📊 Progreso**: estadísticas de aciertos de los 3 modos (Construir, Flashcards,
   Adivina) por modo/palo/grado/tipo; % general e "por tanda"; "dominas mejor / a
   reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`

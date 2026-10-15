@@ -464,7 +464,8 @@ $("fc-detalle-toggle").addEventListener("click", () => {
    MODO QUIZ INVERSO — se da el significado, se adivina la carta
    ============================================================ */
 let quizActual = null;      // carta objetivo de la pregunta en curso
-let quizInv = false;        // ¿la energía descrita es la de la carta invertida?
+let quizInv = false;        // ¿la carta objetivo está invertida? (orientación a adivinar)
+let quizVerInv = false;     // orientación mostrada en la revelación/ficha (editable con Invertir)
 let quizResuelto = false;
 
 /* Construye el texto-pista SIN nombrar la carta, el palo, el elemento
@@ -511,6 +512,28 @@ function distractoresQuiz(correcta, baraja) {
   return elegidas.slice(0, 3);
 }
 
+/* Pulsación larga en una opción → verla a pantalla completa (con su orientación).
+   El toque corto sigue sirviendo para seleccionar/responder. */
+function pulsacionLargaOpcion(btn, op) {
+  let timer = null, largo = false, x0 = 0, y0 = 0;
+  const abrir = () => { largo = true; abrirLightbox(imagenCarta(op.carta), nombreCarta(op.carta), op.inv); };
+  const cancelar = () => { clearTimeout(timer); };
+  btn.addEventListener("pointerdown", (e) => {
+    largo = false; x0 = e.clientX; y0 = e.clientY;
+    timer = setTimeout(abrir, 450);
+  });
+  btn.addEventListener("pointermove", (e) => {
+    if (Math.abs(e.clientX - x0) > 12 || Math.abs(e.clientY - y0) > 12) cancelar();
+  });
+  btn.addEventListener("pointerup", cancelar);
+  btn.addEventListener("pointerleave", cancelar);
+  btn.addEventListener("pointercancel", cancelar);
+  btn.addEventListener("click", (e) => {
+    if (largo) { largo = false; e.preventDefault(); return; } // fue pulsación larga: no seleccionar
+    if (!quizResuelto) responderQuiz(op, btn);
+  });
+}
+
 function pintarOpcionesQuiz(opciones) {
   const cont = $("quiz-opciones");
   cont.innerHTML = "";
@@ -518,11 +541,29 @@ function pintarOpcionesQuiz(opciones) {
     const b = document.createElement("button");
     b.className = "quiz-opcion";
     b.innerHTML =
-      `<img src="${imagenCarta(op.carta)}" alt="${nombreCarta(op.carta)}" />` +
+      `<img class="${op.inv ? "invertida" : ""}" src="${imagenCarta(op.carta)}" alt="${nombreCarta(op.carta)}" />` +
       `<span>${nombreCarta(op.carta)}</span>`;
-    b.addEventListener("click", () => responderQuiz(op, b));
+    pulsacionLargaOpcion(b, op);
     cont.appendChild(b);
   });
+}
+
+/* Pinta la revelación (carta + síntesis + ficha) en la orientación quizVerInv. */
+function pintarRevelacionQuiz() {
+  const inv = quizVerInv;
+  const s = sintesisCarta(quizActual, inv);
+  const img = $("quiz-mini-img");
+  img.src = imagenCarta(quizActual);
+  img.alt = nombreCarta(quizActual);
+  img.classList.toggle("invertida", inv);
+  $("quiz-formula").textContent = s.formula;
+  $("quiz-r-grado").textContent = s.grado;
+  $("quiz-r-elem").textContent = s.elemento;
+  $("quiz-r-puente").textContent = s.puente;
+  renderDetalle(quizActual, inv, "quiz-det-contenido", "quiz-det-links");
+  $("quiz-det-badge").textContent = inv ? "⟳ Invertida" : "Derecha";
+  $("quiz-det-badge").classList.toggle("inv", inv);
+  $("quiz-det-invertir").textContent = inv ? "⟳ Ver al derecho" : "⟳ Ver invertida";
 }
 
 function responderQuiz(op, boton) {
@@ -530,29 +571,20 @@ function responderQuiz(op, boton) {
   quizResuelto = true;
   registrar("quiz", { palo: quizActual.palo, tipo: quizActual.tipo, grado: gradoKey(quizActual) }, op.ok);
   const cont = $("quiz-opciones");
-  // marca la elegida y, siempre, la correcta
+  // marca la elegida y, siempre, la correcta (por identidad de carta)
   boton.classList.add(op.ok ? "correcta" : "incorrecta");
   [...cont.children].forEach((b) => {
     if (b.querySelector("span").textContent === nombreCarta(quizActual)) b.classList.add("correcta");
     b.classList.add("bloqueada");
   });
-  // revela la carta y su síntesis completa
-  const s = sintesisCarta(quizActual, quizInv);
-  const img = $("quiz-mini-img");
-  img.src = imagenCarta(quizActual);
-  img.alt = nombreCarta(quizActual);
-  img.classList.toggle("invertida", quizInv);
-  $("quiz-formula").textContent = s.formula;
-  $("quiz-r-grado").textContent = s.grado;
-  $("quiz-r-elem").textContent = s.elemento;
-  $("quiz-r-puente").textContent = s.puente;
+  // revela en la orientación real de la carta objetivo
+  quizVerInv = quizInv;
+  pintarRevelacionQuiz();
   $("quiz-revelacion").classList.remove("oculto");
   $("quiz-marcador").textContent = op.ok
     ? "✔ ¡Correcto! Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + "."
     : "✘ Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + ".";
   $("quiz-marcador").className = "quiz-marcador " + (op.ok ? "ok" : "mal");
-  // ficha "Conoce esta carta" (colapsada), ahora que ya se adivinó
-  renderDetalle(quizActual, quizInv, "quiz-det-contenido", "quiz-det-links");
   $("quiz-detalle").classList.remove("oculto");
   asegurarVisible($("quiz-revelacion"));
 }
@@ -566,27 +598,31 @@ function nuevaQuiz() {
   quizInv = Math.random() < 0.4; // a veces invertida, para practicar la sombra
   quizResuelto = false;
 
-  const orientHTML = quizInv ? `<div class="quiz-orient">⟳ Carta invertida</div>` : "";
+  // Sin leyenda: la inversión se comunica por la descripción y la imagen de las opciones.
   if (ajustes.quizDificil) {
     // Modo difícil: SOLO la lectura narrativa, sin elemento ni grado.
     const d = DETALLE[quizActual.id];
     const lectura = d ? limpiarPista(quizInv ? d.esoterico.invertido : d.esoterico.derecho) : "";
-    $("quiz-pista").innerHTML = orientHTML +
+    $("quiz-pista").innerHTML =
       `<p><span class="quiz-et">Su lectura</span>${lectura}</p>` +
       `<p class="quiz-dif-nota">Modo difícil: sin pistas de elemento ni grado. Dedúcela solo por su significado.</p>`;
   } else {
     const p = pistaQuiz(quizActual, quizInv);
-    $("quiz-pista").innerHTML = orientHTML +
+    $("quiz-pista").innerHTML =
       `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
       `<span class="quiz-palabras">(${p.palabras})</span></p>` +
       `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
   }
 
-  const opciones = mezclar([
-    { carta: quizActual, ok: true },
-    ...distractoresQuiz(quizActual, baraja).map((c) => ({ carta: c, ok: false })),
-  ]);
-  pintarOpcionesQuiz(opciones);
+  // La correcta se muestra en la orientación real; los distractores, al azar.
+  const correcta = { carta: quizActual, ok: true, inv: quizInv };
+  const distractores = distractoresQuiz(quizActual, baraja)
+    .map((c) => ({ carta: c, ok: false, inv: Math.random() < 0.45 }));
+  // Si la carta objetivo es invertida: al menos 2 opciones invertidas (no regalar la respuesta).
+  if (quizInv && distractores.every((d) => !d.inv) && distractores.length) {
+    distractores[Math.floor(Math.random() * distractores.length)].inv = true;
+  }
+  pintarOpcionesQuiz(mezclar([correcta, ...distractores]));
 
   $("quiz-revelacion").classList.add("oculto");
   $("quiz-marcador").textContent = "";
@@ -618,10 +654,17 @@ $("quiz-detalle-toggle").addEventListener("click", () => {
   $("quiz-detalle-toggle").setAttribute("aria-expanded", quizDetalleAbierto ? "true" : "false");
 });
 
-// Tocar la carta revelada la amplía a pantalla completa
+// Invertir / revertir desde la ficha: estudia los dos significados de la carta
+$("quiz-det-invertir").addEventListener("click", () => {
+  if (!quizResuelto) return;
+  quizVerInv = !quizVerInv;
+  pintarRevelacionQuiz();
+});
+
+// Tocar la carta revelada la amplía a pantalla completa (en su orientación actual)
 $("quiz-mini").addEventListener("click", () => {
   if (quizResuelto && quizActual) {
-    abrirLightbox(imagenCarta(quizActual), nombreCarta(quizActual), quizInv);
+    abrirLightbox(imagenCarta(quizActual), nombreCarta(quizActual), quizVerInv);
   }
 });
 

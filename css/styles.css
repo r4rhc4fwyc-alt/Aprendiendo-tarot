@@ -375,11 +375,6 @@ h2 { letter-spacing: 0.5px; }
   color: var(--acento-2); margin-bottom: 2px;
 }
 .quiz-palabras { color: var(--texto-tenue); font-style: italic; }
-.quiz-orient {
-  display: inline-block; margin-bottom: 12px; padding: 3px 12px;
-  border: 1px solid var(--acento-2); border-radius: 999px;
-  color: var(--acento-2); font-size: 0.82rem; letter-spacing: 0.5px;
-}
 
 .quiz-opciones {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
@@ -389,7 +384,9 @@ h2 { letter-spacing: 0.5px; }
   background: var(--bg-panel-2); color: var(--texto);
   border: 1px solid var(--borde); border-radius: 12px;
   padding: 10px; cursor: pointer; transition: all 0.12s;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
+.quiz-opcion img.invertida { transform: rotate(180deg); }
 .quiz-opcion img {
   width: 100%; max-width: 120px; aspect-ratio: 150 / 264;
   object-fit: cover; border-radius: 8px;
@@ -402,9 +399,14 @@ h2 { letter-spacing: 0.5px; }
 .quiz-opcion:hover { border-color: var(--acento); transform: translateY(-2px); }
 .quiz-opcion.correcta { border-color: var(--ok); background: #1d3a2e; }
 .quiz-opcion.incorrecta { border-color: #d16a6a; background: #3a1d1d; }
-.quiz-opcion.bloqueada { cursor: default; }
+.quiz-opcion.bloqueada { cursor: zoom-in; }
 .quiz-opcion.bloqueada:hover { transform: none; }
 .quiz-opcion.bloqueada:not(.correcta):not(.incorrecta) { opacity: 0.5; }
+
+/* Leyenda discreta de pulsación larga */
+.quiz-lp-hint { color: var(--texto-tenue); font-size: 0.78rem; text-align: center; margin: 10px 0 0; opacity: 0.8; }
+/* Fila de orientación dentro de la ficha de Adivina */
+.quiz-det-orient { margin: 0 0 12px; }
 
 /* Revelación de la carta adivinada */
 .quiz-rev-carta { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
