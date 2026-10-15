@@ -26,6 +26,7 @@ function cargarAjustes() {
     elementoPorPalo: {}, // override: paloId -> elementoId
     incluirCorte: true,
     incluirNumeros: true,
+    quizDificil: false,  // modo difícil de Adivina: pista = solo la lectura
   };
   try {
     const g = JSON.parse(localStorage.getItem(LS.ajustes));
@@ -349,6 +350,7 @@ function guardarSRS(s) {
 }
 let srs = cargarSRS();
 let fcActual = null;
+let fcInv = false; // ¿la flashcard salió invertida?
 
 /* Elige la carta "más vencida": menor dueAt; las nuevas tienen prioridad */
 function elegirFlashcard() {
@@ -376,6 +378,7 @@ function actualizarProgresoFC() {
 /* Saca la siguiente flashcard con la animación del mazo (muestra la cara). */
 function pintarFlashcard() {
   fcActual = elegirFlashcard();
+  fcInv = Math.random() < 0.35; // ~35 % salen invertidas
   actualizarProgresoFC();
   // oculta todo lo del reverso mientras baraja
   $("fc-reverso").classList.add("oculto");
@@ -384,15 +387,15 @@ function pintarFlashcard() {
   $("fc-detalle").classList.add("oculto");
 
   animarMazo({ mazo: "fc-mazo", carta3d: "fc-carta3d", img: "fc-img", nombre: "fc-nombre", zona: "fc-mazo-zona" },
-    fcActual, false, estadoF, () => {
-      $("fc-nombre").textContent = nombreCarta(fcActual);
+    fcActual, fcInv, estadoF, () => {
+      $("fc-nombre").textContent = nombreCarta(fcActual) + (fcInv ? " ⟳ invertida" : "");
       // de momento solo el botón "Ver significado"; el significado se revela al voltear
       $("fc-acciones-frente").classList.remove("oculto");
     });
 }
 
 function voltearFlashcard() {
-  const s = sintesisCarta(fcActual);
+  const s = sintesisCarta(fcActual, fcInv);
   const det = DETALLE[fcActual.id];
   $("fc-narracion").textContent = det ? det.general : "";
   $("fc-formula").textContent = s.formula;
@@ -402,8 +405,8 @@ function voltearFlashcard() {
   $("fc-reverso").classList.remove("oculto");
   $("fc-acciones-frente").classList.add("oculto");
   $("fc-acciones-reverso").classList.remove("oculto");
-  // revela también la ficha detallada (colapsada)
-  renderDetalle(fcActual, false, "fc-det-contenido", "fc-det-links");
+  // revela también la ficha detallada (colapsada), según la orientación
+  renderDetalle(fcActual, fcInv, "fc-det-contenido", "fc-det-links");
   $("fc-detalle").classList.remove("oculto");
 }
 
@@ -445,7 +448,7 @@ $("fc-mazo").addEventListener("click", () => { if (!estadoF.animando) pintarFlas
 $("fc-carta3d").addEventListener("click", (e) => {
   e.stopPropagation();
   if (fcActual && $("fc-carta3d").classList.contains("volteada")) {
-    abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), false);
+    abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), fcInv);
   }
 });
 
@@ -477,6 +480,18 @@ function pistaQuiz(carta, inv) {
     ? `${elem.frase}, pero en bloqueo, exceso o vuelta hacia dentro`
     : elem.frase;
   return { grado, energiaFrase, palabras: elem.palabras.join(", ") };
+}
+
+/* Neutraliza menciones de palo/elemento para el modo difícil
+   (la lectura casi nunca los nombra; esto cubre los casos sueltos). */
+function limpiarPista(t) {
+  return (t || "")
+    .replace(/\bcopas\b/gi, "cartas").replace(/\bcopa\b/gi, "carta")
+    .replace(/\bbastos\b/gi, "cartas").replace(/\bbasto\b/gi, "carta")
+    .replace(/\bespadas\b/gi, "cartas").replace(/\bespada\b/gi, "carta")
+    .replace(/\boros\b/gi, "monedas").replace(/\boro\b/gi, "moneda")
+    .replace(/\b(wands?|cups?|swords?|pentacles?)\b/gi, "cartas")
+    .replace(/\b(fuego|agua|aire|tierra)\b/gi, "energía");
 }
 
 /* Elige 3 distractores "cercanos": prioriza una del mismo palo y una del
@@ -536,21 +551,36 @@ function responderQuiz(op, boton) {
     ? "✔ ¡Correcto! Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + "."
     : "✘ Era " + nombreCarta(quizActual) + (quizInv ? " (invertida)" : "") + ".";
   $("quiz-marcador").className = "quiz-marcador " + (op.ok ? "ok" : "mal");
+  // ficha "Conoce esta carta" (colapsada), ahora que ya se adivinó
+  renderDetalle(quizActual, quizInv, "quiz-det-contenido", "quiz-det-links");
+  $("quiz-detalle").classList.remove("oculto");
   asegurarVisible($("quiz-revelacion"));
 }
 
 function nuevaQuiz() {
+  // refleja el modo guardado en los botones
+  document.querySelectorAll(".quiz-dif-btn").forEach((x) =>
+    x.classList.toggle("activo", (x.dataset.dif === "dificil") === !!ajustes.quizDificil));
   const baraja = barajaActiva();
   quizActual = baraja[Math.floor(Math.random() * baraja.length)];
   quizInv = Math.random() < 0.4; // a veces invertida, para practicar la sombra
   quizResuelto = false;
 
-  const p = pistaQuiz(quizActual, quizInv);
-  $("quiz-pista").innerHTML =
-    (quizInv ? `<div class="quiz-orient">⟳ Carta invertida</div>` : "") +
-    `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
-    `<span class="quiz-palabras">(${p.palabras})</span></p>` +
-    `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
+  const orientHTML = quizInv ? `<div class="quiz-orient">⟳ Carta invertida</div>` : "";
+  if (ajustes.quizDificil) {
+    // Modo difícil: SOLO la lectura narrativa, sin elemento ni grado.
+    const d = DETALLE[quizActual.id];
+    const lectura = d ? limpiarPista(quizInv ? d.esoterico.invertido : d.esoterico.derecho) : "";
+    $("quiz-pista").innerHTML = orientHTML +
+      `<p><span class="quiz-et">Su lectura</span>${lectura}</p>` +
+      `<p class="quiz-dif-nota">Modo difícil: sin pistas de elemento ni grado. Dedúcela solo por su significado.</p>`;
+  } else {
+    const p = pistaQuiz(quizActual, quizInv);
+    $("quiz-pista").innerHTML = orientHTML +
+      `<p><span class="quiz-et">Elemento · energía</span>${p.energiaFrase} ` +
+      `<span class="quiz-palabras">(${p.palabras})</span></p>` +
+      `<p><span class="quiz-et">Grado · número o rango</span>${p.grado}</p>`;
+  }
 
   const opciones = mezclar([
     { carta: quizActual, ok: true },
@@ -561,9 +591,32 @@ function nuevaQuiz() {
   $("quiz-revelacion").classList.add("oculto");
   $("quiz-marcador").textContent = "";
   $("quiz-marcador").className = "quiz-marcador";
+  // reinicia la ficha detallada (oculta y colapsada)
+  $("quiz-detalle").classList.add("oculto");
+  quizDetalleAbierto = false;
+  $("quiz-detalle-cuerpo").classList.add("oculto");
+  $("quiz-detalle-toggle").setAttribute("aria-expanded", "false");
 }
 
 $("quiz-siguiente").addEventListener("click", nuevaQuiz);
+
+// Conmutador de dificultad (persistente en Ajustes)
+document.querySelectorAll(".quiz-dif-btn").forEach((b) =>
+  b.addEventListener("click", () => {
+    ajustes.quizDificil = b.dataset.dif === "dificil";
+    guardarAjustes(ajustes);
+    document.querySelectorAll(".quiz-dif-btn").forEach((x) =>
+      x.classList.toggle("activo", x.dataset.dif === b.dataset.dif));
+    nuevaQuiz(); // regenera la pregunta con el nuevo modo
+  }));
+
+// Desplegar / plegar la ficha detallada en Adivina
+let quizDetalleAbierto = false;
+$("quiz-detalle-toggle").addEventListener("click", () => {
+  quizDetalleAbierto = !quizDetalleAbierto;
+  $("quiz-detalle-cuerpo").classList.toggle("oculto", !quizDetalleAbierto);
+  $("quiz-detalle-toggle").setAttribute("aria-expanded", quizDetalleAbierto ? "true" : "false");
+});
 
 // Tocar la carta revelada la amplía a pantalla completa
 $("quiz-mini").addEventListener("click", () => {

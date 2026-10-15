@@ -39,11 +39,13 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   **"Conoce esta carta"**; pantalla completa. El botón "Barajar" **no saca** carta:
   solo resalta el mazo (el gesto real es tocar el mazo).
 - **🎴 Flashcards**: mismo mazo y animación; repetición espaciada (SM-2 simplificado,
-  en `localStorage`); "Ver significado" revela texto + la ficha; calificación.
-- **🔮 Adivina** (quiz inverso): se da el significado (energía del elemento + aporte
-  del grado, sin nombrar la carta) y se adivina entre 4 opciones con miniatura;
-  distractores "cercanos" (mismo palo / mismo rango), ~40 % invertidas, revela la
-  síntesis al responder.
+  en `localStorage`); ~35 % salen **invertidas** (muestran el significado invertido);
+  "Ver significado" revela texto + la ficha; calificación.
+- **🔮 Adivina** (quiz inverso): se da el significado y se adivina entre 4 opciones
+  con miniatura; distractores "cercanos" (mismo palo / mismo rango), ~40 % invertidas,
+  revela la síntesis y la ficha **"Conoce esta carta"** al responder. Dos niveles:
+  **Normal** (pista = energía del elemento + aporte del grado) y **Difícil** (pista =
+  solo la lectura narrativa, sin nombrar elemento ni grado; se guarda en Ajustes).
 - **📊 Progreso**: estadísticas de aciertos de los 3 modos (Construir, Flashcards,
   Adivina) por modo/palo/grado/tipo; % general e "por tanda"; "dominas mejor / a
   reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`

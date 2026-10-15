@@ -158,6 +158,11 @@
       <div class="panel">
         <p class="instruccion">Al revés que Construir: te damos el <strong>significado</strong> y tú adivinas <strong>qué carta es</strong>.</p>
 
+        <div class="quiz-dif">
+          <button class="quiz-dif-btn activo" data-dif="normal">Normal</button>
+          <button class="quiz-dif-btn" data-dif="dificil">Difícil · solo la lectura</button>
+        </div>
+
         <div class="quiz-pista" id="quiz-pista"></div>
 
         <div class="pregunta">
@@ -180,6 +185,17 @@
         </div>
 
         <div class="quiz-marcador" id="quiz-marcador"></div>
+
+        <!-- Ficha detallada (aparece al responder) -->
+        <div class="panel detalle-panel oculto" id="quiz-detalle">
+          <button class="detalle-toggle" id="quiz-detalle-toggle" aria-expanded="false">
+            <span>📖 Conoce esta carta</span><span class="chev">▾</span>
+          </button>
+          <div class="detalle-cuerpo oculto" id="quiz-detalle-cuerpo">
+            <div id="quiz-det-contenido"></div>
+            <div class="detalle-links" id="quiz-det-links"></div>
+          </div>
+        </div>
 
         <div class="acciones">
           <button id="quiz-siguiente" class="btn-primario">Otra carta →</button>

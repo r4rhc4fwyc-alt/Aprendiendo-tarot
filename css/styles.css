@@ -423,8 +423,21 @@ h2 { letter-spacing: 0.5px; }
 .quiz-marcador.ok { color: var(--ok); }
 .quiz-marcador.mal { color: #e58a8a; }
 
+/* Conmutador de dificultad */
+.quiz-dif { display: flex; gap: 8px; margin: 2px 0 14px; }
+.quiz-dif-btn {
+  flex: 1; background: var(--bg-panel-2); color: var(--texto-tenue);
+  border: 1px solid var(--borde); border-radius: 999px;
+  padding: 8px 10px; cursor: pointer; font-size: 0.88rem; font-family: var(--fuente-texto);
+  transition: all 0.15s;
+}
+.quiz-dif-btn:hover { color: var(--texto); border-color: var(--acento); }
+.quiz-dif-btn.activo { background: var(--acento); color: #1a1326; border-color: var(--acento); font-weight: 600; }
+.quiz-dif-nota { color: var(--texto-tenue); font-size: 0.82rem; font-style: italic; margin: 2px 0 0 !important; }
+
 @media (max-width: 380px) {
   .quiz-opcion span { font-size: 0.82rem; }
+  .quiz-dif-btn { font-size: 0.8rem; }
 }
 
 /* ============================================================

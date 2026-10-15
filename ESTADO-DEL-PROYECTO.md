@@ -51,6 +51,12 @@ para arquitectura y convenciones.
     "Terminar tanda y empezar otra" archiva la tanda al **historial** para comparar
     la mejora; "Reiniciar todas las estadísticas" borra todo. En `localStorage`
     (`tarot_stats_v1`).
+14. **Flashcards invertidas**: ~35 % salen invertidas (significado invertido, ficha
+    y lightbox acordes; insignia "⟳ invertida").
+15. **Adivina — ficha y modo difícil**: "Conoce esta carta" aparece al responder;
+    conmutador **Normal / Difícil**. En difícil la pista es solo la lectura narrativa
+    (`esoterico`), saneada para no nombrar palo/elemento; la preferencia se guarda en
+    Ajustes (`tarot_ajustes_v1.quizDificil`).
 
 ## Decisiones tomadas (el "porqué")
 
@@ -70,8 +76,6 @@ para arquitectura y convenciones.
 
 - **Cargar el sistema propio de lectura del usuario**: sus palabras clave por
   número/palo (sustituir o complementar los textos genéricos).
-- **Flashcards invertidas**: opción de que salgan invertidas y mostrar el significado
-  invertido (ahora siempre salen al derecho).
 - **Zoom con dos dedos** (pinch) en el visor de pantalla completa.
 - **Progreso — ideas**: gráfica de evolución de las tandas; desglose por elemento;
   marcador de racha en vivo dentro de Adivina.
