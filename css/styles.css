@@ -426,3 +426,76 @@ h2 { letter-spacing: 0.5px; }
 @media (max-width: 380px) {
   .quiz-opcion span { font-size: 0.82rem; }
 }
+
+/* ============================================================
+   ESTADÍSTICAS DE PROGRESO (📊 Progreso)
+   ============================================================ */
+.stat-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.stat-tile {
+  background: var(--bg-panel-2); border: 1px solid var(--borde);
+  border-radius: 12px; padding: 14px 10px; text-align: center;
+}
+.stat-tile-tit { font-size: 0.78rem; color: var(--texto-tenue); letter-spacing: 0.3px; }
+.stat-tile-pct { font-family: var(--fuente-titulo); font-size: 2rem; font-weight: 700; margin: 4px 0 2px; }
+.stat-tile-sub { font-size: 0.8rem; color: var(--texto-tenue); }
+
+/* Colores por nivel de dominio */
+.n-ok { color: var(--ok); }
+.n-media { color: var(--acento-2); }
+.n-baja { color: #e58a8a; }
+.n-vacio { color: var(--texto-tenue); }
+
+/* Destacado: dominas mejor / a reforzar */
+.stat-destacado { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-destacado:empty { display: none; }
+.stat-dest {
+  background: var(--bg-panel-2); border: 1px solid var(--borde);
+  border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px;
+}
+.stat-dest.ok { border-color: rgba(90,209,154,0.5); }
+.stat-dest.baja { border-color: rgba(229,138,138,0.5); }
+.stat-dest-et { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--texto-tenue); }
+.stat-dest b { font-family: var(--fuente-titulo); font-size: 1rem; }
+.stat-dest-pct { font-weight: 700; }
+.stat-dest.ok .stat-dest-pct { color: var(--ok); }
+.stat-dest.baja .stat-dest-pct { color: #e58a8a; }
+
+/* Conmutador de ámbito */
+.stat-scope { display: flex; gap: 8px; margin: 6px 0 16px; }
+.stat-scope-btn {
+  flex: 1; background: var(--bg-panel-2); color: var(--texto-tenue);
+  border: 1px solid var(--borde); border-radius: 999px;
+  padding: 8px 10px; cursor: pointer; font-size: 0.9rem; font-family: var(--fuente-texto);
+  transition: all 0.15s;
+}
+.stat-scope-btn:hover { color: var(--texto); border-color: var(--acento); }
+.stat-scope-btn.activo { background: var(--acento); color: #1a1326; border-color: var(--acento); font-weight: 600; }
+
+/* Grupos y barras */
+.stat-grupo {
+  font-family: var(--fuente-titulo); font-size: 0.95rem; color: var(--acento);
+  margin: 20px 0 10px; border-bottom: 1px solid var(--borde); padding-bottom: 5px; letter-spacing: 0.3px;
+}
+.stat-fila { margin-bottom: 11px; }
+.stat-fila-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 0.9rem; margin-bottom: 4px; }
+.stat-num { color: var(--texto-tenue); font-size: 0.82rem; white-space: nowrap; }
+.stat-bar { height: 8px; background: var(--bg-panel); border-radius: 999px; overflow: hidden; border: 1px solid var(--borde); }
+.stat-bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+.stat-bar-fill.n-ok { background: var(--ok); }
+.stat-bar-fill.n-media { background: var(--acento-2); }
+.stat-bar-fill.n-baja { background: #e58a8a; }
+.stat-bar-fill.n-vacio { background: var(--borde); }
+
+/* Historial de tandas */
+.stat-tanda-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  background: var(--bg-panel-2); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 9px 12px; margin-bottom: 7px; font-size: 0.88rem;
+}
+
+#stat-reset { margin-top: 12px; }
+
+@media (max-width: 380px) {
+  .stat-destacado { grid-template-columns: 1fr; }
+  .stat-tile-pct { font-size: 1.7rem; }
+}

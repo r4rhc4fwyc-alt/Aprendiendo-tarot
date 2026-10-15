@@ -43,6 +43,14 @@ para arquitectura y convenciones.
     (prioriza una del mismo palo y una del mismo número/rango) para ejercitar la
     fórmula. Incluye cartas invertidas (~40 %), respeta el alcance de Ajustes,
     revela la síntesis completa al responder y amplía la carta en el lightbox.
+13. **Estadísticas de progreso (📊 Progreso)**: 6ª pestaña. Registra aciertos de los
+    tres modos (Construir cuenta sus 2 preguntas; Adivina acierto/fallo; Flashcards
+    "Bien"/"Fácil" = dominada). Desglose por **modo**, **palo**, **grado** y **tipo**
+    con % y barras de color por nivel. Dos ámbitos: **histórico total** y **esta
+    tanda** (conmutador). Resumen "dominas mejor / a reforzar". Práctica en **tandas**:
+    "Terminar tanda y empezar otra" archiva la tanda al **historial** para comparar
+    la mejora; "Reiniciar todas las estadísticas" borra todo. En `localStorage`
+    (`tarot_stats_v1`).
 
 ## Decisiones tomadas (el "porqué")
 
@@ -65,9 +73,8 @@ para arquitectura y convenciones.
 - **Flashcards invertidas**: opción de que salgan invertidas y mostrar el significado
   invertido (ahora siempre salen al derecho).
 - **Zoom con dos dedos** (pinch) en el visor de pantalla completa.
-- **Estadísticas de progreso**: qué palos/números se dominan.
-- **Quiz inverso — mejoras**: llevar cuenta de aciertos/racha, o integrar el
-  resultado con el SRS de flashcards.
+- **Progreso — ideas**: gráfica de evolución de las tandas; desglose por elemento;
+  marcador de racha en vivo dentro de Adivina.
 - **Afinar animaciones**: velocidad del barajado, entrada con brillo, etc.
 - **Anexo de datos**: `.md` con las 56 fichas completas para pegar en otra IA (pendiente,
   el usuario lo mencionó como opcional).

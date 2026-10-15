@@ -18,6 +18,7 @@
       <button class="tab activo" data-vista="construir">🧩 Construir</button>
       <button class="tab" data-vista="flashcards">🎴 Flashcards</button>
       <button class="tab" data-vista="quiz">🔮 Adivina</button>
+      <button class="tab" data-vista="estadisticas">📊 Progreso</button>
       <button class="tab" data-vista="referencia">📖 Referencia</button>
       <button class="tab" data-vista="ajustes">⚙️ Ajustes</button>
     </nav>
@@ -183,6 +184,31 @@
         <div class="acciones">
           <button id="quiz-siguiente" class="btn-primario">Otra carta →</button>
         </div>
+      </div>
+    </section>
+
+    <!-- ====== ESTADÍSTICAS DE PROGRESO ====== -->
+    <section id="vista-estadisticas" class="vista">
+      <div class="panel">
+        <h2>Tu progreso</h2>
+        <p class="instruccion">Mide cuánto dominas la fórmula en Construir, Flashcards y Adivina.
+          Practica en <strong>tandas</strong> y compara cómo mejoras.</p>
+
+        <div class="stat-tiles" id="stat-tiles"></div>
+        <div class="stat-destacado" id="stat-destacado"></div>
+
+        <div class="stat-scope">
+          <button class="stat-scope-btn activo" data-scope="total">Histórico total</button>
+          <button class="stat-scope-btn" data-scope="tanda">Esta tanda</button>
+        </div>
+
+        <div id="stat-contenido"></div>
+        <div id="stat-historial"></div>
+
+        <div class="acciones">
+          <button id="stat-nueva-tanda" class="btn-secundario">✓ Terminar tanda y empezar otra</button>
+        </div>
+        <button id="stat-reset" class="link-reset">Reiniciar todas las estadísticas</button>
       </div>
     </section>
 

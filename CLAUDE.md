@@ -14,12 +14,13 @@ Rama de trabajo: `claude/kind-cannon-isjfbw`.
 - Librerías externas: solo por CDN (ahora mismo **ninguna**; las estrellas son canvas propio).
 - Las **imágenes** del mazo están dentro del repo (`img/cards/`), nunca se hotlinkean.
 - Responsive **mobile-first**; respetar `prefers-reduced-motion`.
-- Persistencia en `localStorage` con `try/catch` (progreso de flashcards y ajustes).
+- Persistencia en `localStorage` con `try/catch` (progreso de flashcards, ajustes
+  y estadísticas de progreso).
 
 ## Estructura
 
 ```
-index.html              Interfaz y las 4 vistas (pestañas)
+index.html              Interfaz y las 6 vistas (pestañas)
 css/styles.css          Estilos (base + capa de rediseño visual al final)
 js/data.js              Datos base: palos, elementos, números, corte, imágenes, síntesis
 js/cartas-detalle.js    Fichas narradas de las 56 cartas (DETALLE)
@@ -43,6 +44,10 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   del grado, sin nombrar la carta) y se adivina entre 4 opciones con miniatura;
   distractores "cercanos" (mismo palo / mismo rango), ~40 % invertidas, revela la
   síntesis al responder.
+- **📊 Progreso**: estadísticas de aciertos de los 3 modos (Construir, Flashcards,
+  Adivina) por modo/palo/grado/tipo; % general e "por tanda"; "dominas mejor / a
+  reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`
+  (`tarot_stats_v1`).
 - **📖 Referencia**: palos, números 1–10 y corte.
 - **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir corte y numerales.
 

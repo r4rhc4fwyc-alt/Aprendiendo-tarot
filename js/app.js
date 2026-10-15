@@ -5,6 +5,7 @@
 const LS = {
   ajustes: "tarot_ajustes_v1",
   srs: "tarot_srs_v1",
+  stats: "tarot_stats_v1",
 };
 
 /* ---------- Utilidades ---------- */
@@ -64,6 +65,7 @@ document.querySelectorAll(".tab").forEach((btn) => {
     if (btn.dataset.vista === "referencia") renderReferencia();
     if (btn.dataset.vista === "ajustes") renderAjustes();
     if (btn.dataset.vista === "quiz" && !quizActual) nuevaQuiz();
+    if (btn.dataset.vista === "estadisticas") renderEstadisticas();
   });
 });
 
@@ -91,7 +93,7 @@ function opcionesElemento(carta, inv) {
   return mezclar([{ t: correcta, ok: true }, ...otros.map((t) => ({ t, ok: false }))]);
 }
 
-function pintarOpciones(contenedor, opciones) {
+function pintarOpciones(contenedor, opciones, onAnswer) {
   contenedor.innerHTML = "";
   opciones.forEach((op) => {
     const b = document.createElement("button");
@@ -107,6 +109,7 @@ function pintarOpciones(contenedor, opciones) {
       [...contenedor.children].forEach((c, i) => {
         if (opciones[i].ok) c.classList.add("correcta");
       });
+      if (onAnswer) onAnswer(!!op.ok);
     });
     contenedor.appendChild(b);
   });
@@ -139,8 +142,10 @@ function cartaDesdeSelector() {
 function montarPreguntas(carta, inv) {
   const gc = $("c-op-grado"), ec = $("c-op-elem");
   delete gc.dataset.resuelto; delete ec.dataset.resuelto;
-  pintarOpciones(gc, opcionesGrado(carta, inv));
-  pintarOpciones(ec, opcionesElemento(carta, inv));
+  pintarOpciones(gc, opcionesGrado(carta, inv),
+    (ok) => registrar("construir", { tipo: carta.tipo, grado: gradoKey(carta) }, ok));
+  pintarOpciones(ec, opcionesElemento(carta, inv),
+    (ok) => registrar("construir", { palo: carta.palo }, ok));
   $("c-instruccion").innerHTML = inv
     ? "⟳ Carta <strong>invertida</strong>: elige su significado <strong>invertido</strong>. Luego revela la síntesis."
     : "Elige el significado del <strong>grado</strong> y del <strong>elemento</strong>. Luego revela la síntesis.";
@@ -404,6 +409,8 @@ function voltearFlashcard() {
 
 /* calidad: 0 otra vez, 1 difícil, 2 bien, 3 fácil */
 function evaluarFlashcard(calidad) {
+  // Para estadísticas: "Bien"/"Fácil" (2-3) cuentan como dominada.
+  registrar("flashcards", { palo: fcActual.palo, tipo: fcActual.tipo, grado: gradoKey(fcActual) }, calidad >= 2);
   const e = srs[fcActual.id] || { ef: 2.5, intervalo: 0, reps: 0 };
   if (calidad === 0) {
     e.reps = 0; e.intervalo = 0; // vuelve pronto
@@ -506,6 +513,7 @@ function pintarOpcionesQuiz(opciones) {
 function responderQuiz(op, boton) {
   if (quizResuelto) return;
   quizResuelto = true;
+  registrar("quiz", { palo: quizActual.palo, tipo: quizActual.tipo, grado: gradoKey(quizActual) }, op.ok);
   const cont = $("quiz-opciones");
   // marca la elegida y, siempre, la correcta
   boton.classList.add(op.ok ? "correcta" : "incorrecta");
@@ -561,6 +569,180 @@ $("quiz-siguiente").addEventListener("click", nuevaQuiz);
 $("quiz-mini").addEventListener("click", () => {
   if (quizResuelto && quizActual) {
     abrirLightbox(imagenCarta(quizActual), nombreCarta(quizActual), quizInv);
+  }
+});
+
+/* ============================================================
+   ESTADÍSTICAS DE PROGRESO (📊 Progreso)
+   Registra aciertos de los 3 modos, por modo/palo/grado/tipo,
+   en dos ámbitos: la "tanda" actual y el histórico "total".
+   ============================================================ */
+function nuevoAcc() {
+  return { intentos: 0, aciertos: 0, porModo: {}, porPalo: {}, porTipo: {}, porGrado: {} };
+}
+function estadoStatsInicial() {
+  return { tanda: nuevoAcc(), total: nuevoAcc(), historial: [], tandaNum: 1 };
+}
+function cargarStats() {
+  const base = estadoStatsInicial();
+  try {
+    const g = JSON.parse(localStorage.getItem(LS.stats));
+    if (g) Object.assign(base, g);
+  } catch (e) {}
+  return base;
+}
+function guardarStats(s) {
+  try { localStorage.setItem(LS.stats, JSON.stringify(s)); } catch (e) {}
+}
+let estadisticas = cargarStats();
+let statScope = "total"; // "total" | "tanda"
+
+/* Clave del grado de una carta (para agrupar) */
+function gradoKey(carta) {
+  return carta.tipo === "numero" ? String(carta.num) : carta.rango;
+}
+
+function bump(obj, key, ok) {
+  if (key == null) return;
+  const b = obj[key] || (obj[key] = { i: 0, a: 0 });
+  b.i++; if (ok) b.a++;
+}
+
+/* Registra un intento. buckets = { palo?, tipo?, grado? } */
+function registrar(modo, buckets, ok) {
+  for (const sc of [estadisticas.tanda, estadisticas.total]) {
+    sc.intentos++; if (ok) sc.aciertos++;
+    bump(sc.porModo, modo, ok);
+    bump(sc.porPalo, buckets.palo, ok);
+    bump(sc.porTipo, buckets.tipo, ok);
+    bump(sc.porGrado, buckets.grado, ok);
+  }
+  guardarStats(estadisticas);
+}
+
+function archivarTanda() {
+  const t = estadisticas.tanda;
+  if (t.intentos > 0) {
+    estadisticas.historial.unshift({
+      n: estadisticas.tandaNum,
+      fecha: Date.now(),
+      intentos: t.intentos,
+      aciertos: t.aciertos,
+    });
+    estadisticas.tandaNum++;
+  }
+  estadisticas.tanda = nuevoAcc();
+  guardarStats(estadisticas);
+}
+
+function reiniciarStats() {
+  estadisticas = estadoStatsInicial();
+  guardarStats(estadisticas);
+}
+
+/* --- Helpers de presentación --- */
+function pct(a, i) { return i ? Math.round((a / i) * 100) : 0; }
+function nivelClase(p, i) { return !i ? "n-vacio" : p >= 70 ? "n-ok" : p >= 40 ? "n-media" : "n-baja"; }
+function fechaCorta(ts) {
+  try {
+    return new Date(ts).toLocaleString("es", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  } catch (e) { return ""; }
+}
+const MODO_LABEL = { construir: "🧩 Construir", quiz: "🔮 Adivina", flashcards: "🎴 Flashcards" };
+function modoLabel(k) { return MODO_LABEL[k] || k; }
+function paloLabel(k) {
+  const p = PALOS[k]; if (!p) return k;
+  return `${p.emoji} ${p.nombre} · ${ELEMENTOS[p.elemento].nombre}`;
+}
+const TIPO_LABEL = { numero: "Numerales (As–10)", corte: "Corte (Paje–Rey)" };
+function tipoLabel(k) { return TIPO_LABEL[k] || k; }
+function gradoLabel(k) {
+  if (CORTE[k]) return CORTE[k].nombre.split(" / ")[0];
+  return k === "1" ? "As" : k;
+}
+
+function tileStat(titulo, acc) {
+  const p = pct(acc.aciertos, acc.intentos);
+  return `<div class="stat-tile">
+    <div class="stat-tile-tit">${titulo}</div>
+    <div class="stat-tile-pct ${nivelClase(p, acc.intentos)}">${acc.intentos ? p + "%" : "—"}</div>
+    <div class="stat-tile-sub">${acc.aciertos}/${acc.intentos} aciertos</div>
+  </div>`;
+}
+function filaStat(label, b) {
+  const p = pct(b.a, b.i);
+  return `<div class="stat-fila">
+    <div class="stat-fila-top"><span>${label}</span><span class="stat-num">${p}% · ${b.a}/${b.i}</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill ${nivelClase(p, b.i)}" style="width:${p}%"></div></div>
+  </div>`;
+}
+function grupoStat(titulo, mapa, labelFn) {
+  const keys = Object.keys(mapa).filter((k) => mapa[k].i > 0)
+    .sort((a, b) => pct(mapa[b].a, mapa[b].i) - pct(mapa[a].a, mapa[a].i));
+  if (!keys.length) return "";
+  return `<h3 class="stat-grupo">${titulo}</h3>` + keys.map((k) => filaStat(labelFn(k), mapa[k])).join("");
+}
+function mejorPeor(scope) {
+  const combos = [];
+  for (const p of Object.keys(scope.porPalo)) combos.push({ label: paloLabel(p), ...scope.porPalo[p] });
+  for (const g of Object.keys(scope.porGrado)) combos.push({ label: gradoLabel(g), ...scope.porGrado[g] });
+  const fiables = combos.filter((c) => c.i >= 3);
+  const pool = fiables.length ? fiables : combos.filter((c) => c.i > 0);
+  if (pool.length < 1) return null;
+  pool.sort((a, b) => pct(b.a, b.i) - pct(a.a, a.i));
+  return { mejor: pool[0], peor: pool[pool.length - 1], soloUno: pool.length === 1 };
+}
+
+function renderEstadisticas() {
+  $("stat-tiles").innerHTML =
+    tileStat(`Esta tanda (nº ${estadisticas.tandaNum})`, estadisticas.tanda) +
+    tileStat("Histórico total", estadisticas.total);
+
+  const scope = statScope === "tanda" ? estadisticas.tanda : estadisticas.total;
+
+  const mp = mejorPeor(scope);
+  $("stat-destacado").innerHTML = mp
+    ? `<div class="stat-dest ok"><span class="stat-dest-et">Dominas mejor</span>
+         <b>${mp.mejor.label}</b><span class="stat-dest-pct">${pct(mp.mejor.a, mp.mejor.i)}%</span></div>` +
+      (mp.soloUno ? "" :
+      `<div class="stat-dest baja"><span class="stat-dest-et">A reforzar</span>
+         <b>${mp.peor.label}</b><span class="stat-dest-pct">${pct(mp.peor.a, mp.peor.i)}%</span></div>`)
+    : "";
+
+  document.querySelectorAll(".stat-scope-btn").forEach((b) =>
+    b.classList.toggle("activo", b.dataset.scope === statScope));
+
+  let html = "";
+  html += grupoStat("Por modo", scope.porModo, modoLabel);
+  html += grupoStat("Por palo", scope.porPalo, paloLabel);
+  html += grupoStat("Por grado (número / rango)", scope.porGrado, gradoLabel);
+  html += grupoStat("Por tipo de carta", scope.porTipo, tipoLabel);
+  $("stat-contenido").innerHTML = html ||
+    `<p class="mini">Aún no hay datos ${statScope === "tanda" ? "en esta tanda" : "registrados"}.
+     Practica en Construir, Flashcards o Adivina y vuelve aquí.</p>`;
+
+  $("stat-historial").innerHTML = estadisticas.historial.length
+    ? `<h3 class="stat-grupo">Tandas anteriores</h3>` + estadisticas.historial.map((h) =>
+        `<div class="stat-tanda-row"><span>Tanda ${h.n} · ${fechaCorta(h.fecha)}</span>
+         <span class="stat-num">${pct(h.aciertos, h.intentos)}% · ${h.aciertos}/${h.intentos}</span></div>`).join("")
+    : "";
+}
+
+document.querySelectorAll(".stat-scope-btn").forEach((b) =>
+  b.addEventListener("click", () => { statScope = b.dataset.scope; renderEstadisticas(); }));
+
+$("stat-nueva-tanda").addEventListener("click", () => {
+  if (estadisticas.tanda.intentos === 0) { statScope = "tanda"; renderEstadisticas(); return; }
+  archivarTanda();
+  statScope = "tanda";
+  renderEstadisticas();
+});
+
+$("stat-reset").addEventListener("click", () => {
+  if (confirm("¿Borrar TODAS las estadísticas y el historial de tandas? No se puede deshacer.")) {
+    reiniciarStats();
+    statScope = "total";
+    renderEstadisticas();
   }
 });
 
