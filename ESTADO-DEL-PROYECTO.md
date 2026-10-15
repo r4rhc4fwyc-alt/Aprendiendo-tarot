@@ -64,6 +64,11 @@ para arquitectura y convenciones.
     pantalla completa (con leyenda discreta). La ficha "Conoce esta carta" trae botón
     **Invertir/Revertir** (`quizVerInv`) que voltea imagen + síntesis + lectura para
     aprender ambos significados.
+17. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
+    archivos ni dependencias, offline): barajar (riffle = ráfagas de ruido filtrado),
+    voltear/revelar, acierto (arpegio mayor) y error (tono grave suave). Se disparan
+    en Construir, Flashcards y Adivina. Interruptor en Ajustes (`tarot_ajustes_v1.sonido`,
+    por defecto activado); el audio se desbloquea con el primer gesto (autoplay).
 
 ## Decisiones tomadas (el "porqué")
 

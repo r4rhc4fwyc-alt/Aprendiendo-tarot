@@ -11,7 +11,8 @@ Rama de trabajo: `claude/kind-cannon-isjfbw`.
 
 - **Sin backend, sin build, sin frameworks.** HTML + CSS + JavaScript "vanilla".
 - Todo el "conocimiento" vive en archivos JS (funciona **offline**).
-- Librerías externas: solo por CDN (ahora mismo **ninguna**; las estrellas son canvas propio).
+- Librerías externas: solo por CDN (ahora mismo **ninguna**; las estrellas son canvas
+  propio y los efectos de sonido se sintetizan con la Web Audio API, sin archivos).
 - Las **imágenes** del mazo están dentro del repo (`img/cards/`), nunca se hotlinkean.
 - Responsive **mobile-first**; respetar `prefers-reduced-motion`.
 - Persistencia en `localStorage` con `try/catch` (progreso de flashcards, ajustes
@@ -25,6 +26,7 @@ css/styles.css          Estilos (base + capa de rediseño visual al final)
 js/data.js              Datos base: palos, elementos, números, corte, imágenes, síntesis
 js/cartas-detalle.js    Fichas narradas de las 56 cartas (DETALLE)
 js/app.js               Lógica: navegación, Construir, Flashcards (SRS), Referencia, Ajustes, lightbox
+js/sonido.js            Efectos de sonido sintetizados (Web Audio API, sin archivos)
 js/estrellas.js         Cielo estrellado animado (canvas, sin dependencias)
 img/cards/*.png         56 imágenes Rider-Waite (Cups/Wands/Swords/Pentacles 01–14; 11=Paje…14=Rey)
 img/dorso-mazo.jpg      Reverso del mazo (ilustración del usuario)
@@ -55,7 +57,8 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   reforzar"; práctica en **tandas** con historial; reinicio. En `localStorage`
   (`tarot_stats_v1`).
 - **📖 Referencia**: palos, números 1–10 y corte.
-- **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir corte y numerales.
+- **⚙️ Ajustes**: correspondencia palo↔elemento editable; incluir/excluir corte y
+  numerales; interruptor de **sonido**.
 
 ## Convenciones de datos
 

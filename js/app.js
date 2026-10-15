@@ -27,6 +27,7 @@ function cargarAjustes() {
     incluirCorte: true,
     incluirNumeros: true,
     quizDificil: false,  // modo difícil de Adivina: pista = solo la lectura
+    sonido: true,        // efectos de sonido
   };
   try {
     const g = JSON.parse(localStorage.getItem(LS.ajustes));
@@ -110,6 +111,7 @@ function pintarOpciones(contenedor, opciones, onAnswer) {
       [...contenedor.children].forEach((c, i) => {
         if (opciones[i].ok) c.classList.add("correcta");
       });
+      (op.ok ? Sonido.acierto : Sonido.error)();
       if (onAnswer) onAnswer(!!op.ok);
     });
     contenedor.appendChild(b);
@@ -232,6 +234,7 @@ function animarMazo(ids, carta, inv, estado, onReveal) {
   mazo.classList.remove("barajando");
   void mazo.offsetWidth;
   mazo.classList.add("barajando");
+  Sonido.barajar();
 
   setTimeout(() => {
     const img = $(ids.img);
@@ -243,6 +246,7 @@ function animarMazo(ids, carta, inv, estado, onReveal) {
     if (ids.nombre) $(ids.nombre).textContent = "…";
     setTimeout(() => {
       c3d.classList.add("volteada");
+      Sonido.voltear();
       setTimeout(() => {
         estado.animando = false;
         if (onReveal) onReveal();
@@ -395,6 +399,7 @@ function pintarFlashcard() {
 }
 
 function voltearFlashcard() {
+  Sonido.voltear();
   const s = sintesisCarta(fcActual, fcInv);
   const det = DETALLE[fcActual.id];
   $("fc-narracion").textContent = det ? det.general : "";
@@ -569,6 +574,7 @@ function pintarRevelacionQuiz() {
 function responderQuiz(op, boton) {
   if (quizResuelto) return;
   quizResuelto = true;
+  (op.ok ? Sonido.acierto : Sonido.error)();
   registrar("quiz", { palo: quizActual.palo, tipo: quizActual.tipo, grado: gradoKey(quizActual) }, op.ok);
   const cont = $("quiz-opciones");
   // marca la elegida y, siempre, la correcta (por identidad de carta)
@@ -908,6 +914,7 @@ function renderAjustes() {
 
   $("aj-incluir-corte").checked = ajustes.incluirCorte;
   $("aj-incluir-numeros").checked = ajustes.incluirNumeros;
+  $("aj-sonido").checked = ajustes.sonido;
   actualizarNotaAlcance();
 }
 
@@ -928,6 +935,11 @@ $("aj-incluir-numeros").addEventListener("change", (e) => {
   if (!e.target.checked && !ajustes.incluirCorte) { e.target.checked = true; return; }
   ajustes.incluirNumeros = e.target.checked; guardarAjustes(ajustes);
   actualizarNotaAlcance(); actualizarProgresoFC();
+});
+$("aj-sonido").addEventListener("change", (e) => {
+  ajustes.sonido = e.target.checked; guardarAjustes(ajustes);
+  Sonido.set(ajustes.sonido);
+  if (ajustes.sonido) Sonido.voltear(); // pequeña confirmación audible al activar
 });
 
 /* ============================================================
@@ -951,3 +963,6 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarLigh
 aplicarAjustesAPalos();
 poblarSelectores();
 actualizarProgresoFC();
+Sonido.init(ajustes.sonido);
+// Desbloquea el audio con el primer gesto del usuario (política de autoplay).
+document.addEventListener("pointerdown", () => Sonido.desbloquear(), { once: true });
