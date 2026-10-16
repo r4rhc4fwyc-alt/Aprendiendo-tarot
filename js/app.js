@@ -189,16 +189,15 @@ function enlacesCarta(carta) {
   };
 }
 
-/* Ficha (Fase 1) de un Arcano Mayor. */
+/* Ficha narrada de un Arcano Mayor. */
 function renderDetalleMayor(carta, inv, cont) {
   const m = MAYORES[carta.n];
   const red = reducirNum(carta.n);
   const numInfo = red >= 1 && red <= 10 ? NUMEROS[red] : null;
-  const titulo = m.claves.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(" · ");
   cont.innerHTML = `
-    <p class="det-general">${titulo}</p>
-    <h4>🔮 Lectura ${inv ? "(invertida)" : "(al derecho)"}</h4>
-    <p>${inv ? m.invertido : m.derecho}</p>
+    <p class="det-general">${m.general}</p>
+    <h4>🎴 La escena</h4><p>${m.simbolismo}</p>
+    <h4>🔮 Lectura ${inv ? "(invertida)" : "(al derecho)"}</h4><p>${inv ? m.invertido : m.derecho}</p>
     <h4>🧭 Correspondencias</h4>
     <ul class="det-corr">
       <li><b>Arcano:</b> ${romanoMayor(carta.n)} (${carta.n})</li>
@@ -206,7 +205,7 @@ function renderDetalleMayor(carta, inv, cont) {
       <li><b>El viaje:</b> ${LINEA_NOMBRE[lineaMayor(carta.n)]}</li>
       ${carta.n === 0 ? "" : `<li><b>Numerología:</b> ${carta.n} → ${red}${numInfo ? " (" + numInfo.nombre + ")" : ""}</li>`}
     </ul>
-    <p class="mini">Ficha narrada completa: próximamente (Fase 2).</p>`;
+    <h4>✨ Lo que la hace única</h4><p>${m.particularidad}</p>`;
 }
 
 let detalleAbierto = false;

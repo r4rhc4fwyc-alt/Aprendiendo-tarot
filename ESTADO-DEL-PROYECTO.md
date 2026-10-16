@@ -77,9 +77,11 @@ para arquitectura y convenciones.
     viaje+numerología o solo lectura en difícil; distractores cercanos por línea/número
     reducido; 2 pasos con orientación), **Flashcards** y **Progreso** (tipo `mayor`).
     **Construir** se queda solo con menores (`barajaConstruir()`). **Ajustes**: activar/
-    desactivar Mayores y Menores (guarda que no deje la baraja vacía). Fase 1 = palabras
-    clave + lectura corta derecho/invertido + correspondencia Golden Dawn; **falta Fase 2**
-    (fichas narradas completas como los menores) y afinar la numerología/stats por línea.
+    desactivar Mayores y Menores (guarda que no deje la baraja vacía).
+    **Fase 2 (hecha)**: las 22 fichas narradas tienen **esencia** del arquetipo (más
+    desarrollada que en los menores, con matices psicológicos/simbólicos), **la escena**
+    RWS y la **particularidad**; la lectura corta derecho/invertido se mantiene para la
+    pista. Pendiente opcional: afinar stats por línea/número reducido.
 19. **Sonido** (`js/sonido.js`): efectos sintetizados con la Web Audio API (sin
     archivos ni dependencias, offline): barajar (riffle = ráfagas de ruido filtrado),
     voltear/revelar, acierto (arpegio mayor) y error (tono grave suave). Se disparan
@@ -102,9 +104,8 @@ para arquitectura y convenciones.
 
 ## Backlog / ideas pendientes (de dónde seguir)
 
-- **Arcanos Mayores — Fase 2**: fichas narradas completas de las 22 (general, escena,
-  lectura larga, particularidad), al nivel de los menores; desglose de Progreso por
-  línea/número reducido; posible "viaje del Loco" interactivo.
+- **Arcanos Mayores — extras**: desglose de Progreso por línea/número reducido; posible
+  "viaje del Loco" interactivo en Referencia.
 - **Cargar el sistema propio de lectura del usuario**: sus palabras clave por
   número/palo (sustituir o complementar los textos genéricos).
 - **Zoom con dos dedos** (pinch) en el visor de pantalla completa.

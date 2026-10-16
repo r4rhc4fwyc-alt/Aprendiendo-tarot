@@ -65,17 +65,19 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   Mayores** y **Menores** (y dentro de menores, corte y numerales); interruptor de
   **sonido**.
 
-## Arcanos Mayores (Fase 1)
+## Arcanos Mayores
 
 - Los 22 mayores **no usan la fórmula** número×elemento (son arquetipos). Se aprenden
   por **arquetipo + viaje del Loco + numerología** (número reducido = puente con los
   numerales que ya se conocen). Datos en `js/arcanos-mayores.js` (`MAYORES`, con
-  `nombre`, `corr`, `claves`, `derecho`, `invertido`; helpers `romanoMayor`,
+  `nombre`, `corr`, `claves`, `derecho`, `invertido` —lectura corta para la pista—, y
+  **`general`** (esencia del arquetipo, más desarrollada que en los menores),
+  **`simbolismo`** (la escena RWS) y **`particularidad`**; helpers `romanoMayor`,
   `lineaMayor`, `reducirNum`, `LINEA_NOMBRE`, `MAYOR_SLUG`).
 - Entran en **Adivina**, **Flashcards** y **Progreso** (tipo `mayor`); **Construir**
   se queda **solo con menores** (`barajaConstruir()`). Correspondencias Golden Dawn
-  (RWS: VIII=Fuerza, XI=Justicia). Fase 1 = palabras clave + lectura corta; las
-  fichas narradas completas quedan para la Fase 2.
+  (RWS: VIII=Fuerza, XI=Justicia). La ficha "Conoce esta carta" muestra esencia +
+  escena + lectura (derecho/invertido) + correspondencias + particularidad.
 
 ## Convenciones de datos
 
