@@ -1,14 +1,16 @@
-# Estado del proyecto — Arcanos Menores
+# Estado del proyecto — Arcana
 
 Documento de **traspaso** para retomar el trabajo en una sesión nueva.
-Última actualización: 2026-10-15. Rama: `claude/kind-cannon-isjfbw`.
+Última actualización: 2026-10-16. Rama: `claude/kind-cannon-isjfbw`.
 
 ## Qué es
 
-App web estática para aprender los Arcanos Menores del tarot por la fórmula
-**Número/Rango × Elemento**, con imágenes Rider-Waite (dominio público) y fichas
-narradas. En español, mobile-first, publicable en GitHub Pages. Ver `CLAUDE.md`
-para arquitectura y convenciones.
+**Arcana**: app web estática para aprender el tarot completo (78 cartas). Los
+**menores** por la fórmula **Número/Rango × Elemento** y los **mayores** por
+arquetipo + viaje del Loco + numerología; con imágenes Rider-Waite (dominio público)
+y fichas narradas. En español, mobile-first, publicable en GitHub Pages. Ver
+`CLAUDE.md` para arquitectura y convenciones. (La carpeta del repo sigue siendo
+`Aprendiendo-tarot`.)
 
 ## Hecho hasta ahora (hitos)
 

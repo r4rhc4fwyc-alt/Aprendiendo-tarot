@@ -1,8 +1,10 @@
 # CLAUDE.md — Contexto del proyecto
 
-App web **estática** para **aprender los Arcanos Menores del tarot** por la fórmula
-**(Número/Rango) × (Elemento del palo)**, con el mazo **Rider-Waite-Smith** (dominio
-público). Pensada para quien ya conoce los Arcanos Mayores. UI en **español**.
+**Arcana** — app web **estática** para **aprender el tarot** con el mazo
+**Rider-Waite-Smith** (dominio público). Los **Arcanos Menores** se enseñan por la
+fórmula **(Número/Rango) × (Elemento del palo)**; los **Arcanos Mayores**, por
+arquetipo + viaje del Loco + numerología. UI en **español**. (La carpeta del repo se
+sigue llamando `Aprendiendo-tarot`.)
 
 Se publica en **GitHub Pages** y debe funcionar como simple enlace, también en móvil.
 Rama de trabajo: `claude/kind-cannon-isjfbw`.
