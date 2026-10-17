@@ -401,7 +401,8 @@ function guardarSRS(s) {
 }
 let srs = cargarSRS();
 let fcActual = null;
-let fcInv = false; // ¿la flashcard salió invertida?
+let fcInv = false;    // ¿la flashcard salió invertida?
+let fcVerInv = false; // orientación mostrada en el reverso/ficha (editable con Invertir)
 
 /* Elige la carta "más vencida": menor dueAt; las nuevas tienen prioridad */
 function elegirFlashcard() {
@@ -445,20 +446,38 @@ function pintarFlashcard() {
     });
 }
 
-function voltearFlashcard() {
-  Sonido.voltear();
-  const s = sintesisCarta(fcActual, fcInv);
-  const det = DETALLE[fcActual.id];
-  $("fc-narracion").textContent = det ? det.general : "";
+/* Texto narrado (general) de una carta, mayor o menor. */
+function narracionDe(carta) {
+  if (carta.tipo === "mayor") return MAYORES[carta.n].general;
+  const d = DETALLE[carta.id];
+  return d ? d.general : "";
+}
+
+/* Pinta el reverso (síntesis + ficha + imagen) en la orientación fcVerInv. */
+function pintarReversoFC() {
+  const inv = fcVerInv;
+  const s = sintesisCarta(fcActual, inv);
+  $("fc-img").classList.toggle("invertida", inv);
+  $("fc-nombre").textContent = nombreCarta(fcActual) + (inv ? " ⟳ invertida" : "");
+  $("fc-narracion").textContent = narracionDe(fcActual);
   $("fc-formula").textContent = s.formula;
   $("fc-grado").textContent = (s.etGrado || "Grado") + ": " + s.grado;
   $("fc-elem").textContent = s.elemento;
   $("fc-puente").textContent = s.puente;
+  renderDetalle(fcActual, inv, "fc-det-contenido", "fc-det-links");
+  $("fc-det-badge").textContent = inv ? "⟳ Invertida" : "Derecha";
+  $("fc-det-badge").classList.toggle("inv", inv);
+  $("fc-det-invertir").textContent = inv ? "⟳ Ver al derecho" : "⟳ Ver invertida";
+}
+
+function voltearFlashcard() {
+  Sonido.voltear();
+  fcVerInv = fcInv; // arranca en la orientación en que salió
+  pintarReversoFC();
   $("fc-reverso").classList.remove("oculto");
   $("fc-acciones-frente").classList.add("oculto");
   $("fc-acciones-reverso").classList.remove("oculto");
-  // revela también la ficha detallada (colapsada), según la orientación
-  renderDetalle(fcActual, fcInv, "fc-det-contenido", "fc-det-links");
+  // revela también la ficha detallada (colapsada)
   $("fc-detalle").classList.remove("oculto");
 }
 
@@ -484,6 +503,12 @@ function evaluarFlashcard(calidad) {
 }
 
 $("fc-voltear").addEventListener("click", voltearFlashcard);
+// Invertir / revertir desde la ficha: estudia los dos significados de la carta
+$("fc-det-invertir").addEventListener("click", () => {
+  if (!fcActual || $("fc-reverso").classList.contains("oculto")) return;
+  fcVerInv = !fcVerInv;
+  pintarReversoFC();
+});
 document.querySelectorAll(".btn-eval").forEach((b) =>
   b.addEventListener("click", () => evaluarFlashcard(parseInt(b.dataset.q, 10)))
 );
@@ -500,7 +525,7 @@ $("fc-mazo").addEventListener("click", () => { if (!estadoF.animando) pintarFlas
 $("fc-carta3d").addEventListener("click", (e) => {
   e.stopPropagation();
   if (fcActual && $("fc-carta3d").classList.contains("volteada")) {
-    abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), fcInv);
+    abrirLightbox(imagenCarta(fcActual), nombreCarta(fcActual), fcVerInv);
   }
 });
 

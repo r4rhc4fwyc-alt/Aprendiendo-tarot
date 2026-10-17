@@ -46,7 +46,8 @@ ESTADO-DEL-PROYECTO.md  Estado, decisiones y backlog (leer para retomar)
   solo resalta el mazo (el gesto real es tocar el mazo).
 - **🎴 Flashcards**: mismo mazo y animación; repetición espaciada (SM-2 simplificado,
   en `localStorage`); ~35 % salen **invertidas** (muestran el significado invertido);
-  "Ver significado" revela texto + la ficha; calificación.
+  "Ver significado" revela texto + la ficha; la ficha "Conoce esta carta" trae botón
+  **Invertir/Revertir** (como Adivina) para estudiar ambos significados; calificación.
 - **🔮 Adivina** (quiz inverso): se da el significado y se adivina en **dos pasos**:
   (1) elegir la **carta** entre 4 opciones al derecho (distractores "cercanos": mismo
   palo / mismo rango); (2) elegir su **orientación** (al derecho / invertida). Solo es
