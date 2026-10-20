@@ -89,6 +89,16 @@ y fichas narradas. En español, mobile-first, publicable en GitHub Pages. Ver
     voltear/revelar, acierto (arpegio mayor) y error (tono grave suave). Se disparan
     en Construir, Flashcards y Adivina. Interruptor en Ajustes (`tarot_ajustes_v1.sonido`,
     por defecto activado); el audio se desbloquea con el primer gesto (autoplay).
+20. **Renombrada a "Arcana"**: `<title>`, `<h1>` (🌙 Arcana) y subtítulo
+    ("Aprende el tarot, carta a carta"). La carpeta del repo sigue siendo
+    `Aprendiendo-tarot`.
+21. **Flashcards — botón Invertir/Revertir** en la ficha "Conoce esta carta"
+    (`fcVerInv` + `pintarReversoFC`): voltea imagen + síntesis + ficha + nombre entre
+    derecho e invertido, para estudiar ambos significados (igual que Adivina).
+22. **Publicación**: la rama de trabajo se fusionó a `main` (fast-forward). GitHub
+    Pages puede servir desde `main`; URL esperada
+    `https://r4rhc4fwyc-alt.github.io/Aprendiendo-tarot/`. Se sigue desarrollando en
+    `claude/kind-cannon-isjfbw` y se hace fast-forward a `main` cuando el usuario lo pide.
 
 ## Decisiones tomadas (el "porqué")
 
@@ -125,5 +135,7 @@ y fichas narradas. En español, mobile-first, publicable en GitHub Pages. Ver
    rama `claude/kind-cannon-isjfbw`.
 2. Primer mensaje sugerido:
    *"Lee CLAUDE.md y ESTADO-DEL-PROYECTO.md y seguimos desde el backlog."*
-3. Para ver la app en vivo: GitHub Pages (Settings → Pages → rama `claude/kind-cannon-isjfbw`,
-   carpeta `/ (root)`), o abrir `index.html` localmente.
+3. Para ver la app en vivo: GitHub Pages (Settings → Pages → rama `main` o
+   `claude/kind-cannon-isjfbw`, carpeta `/ (root)`), o abrir `index.html` localmente.
+   URL: `https://r4rhc4fwyc-alt.github.io/Aprendiendo-tarot/`.
+4. Probar cambios: `node --check js/*.js` y render con Playwright (ver CLAUDE.md).
