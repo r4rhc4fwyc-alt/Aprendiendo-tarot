@@ -76,6 +76,7 @@ document.querySelectorAll(".tab").forEach((btn) => {
     if (btn.dataset.vista === "referencia") renderReferencia();
     if (btn.dataset.vista === "ajustes") renderAjustes();
     if (btn.dataset.vista === "quiz" && !quizActual) nuevaQuiz();
+    if (btn.dataset.vista === "mayores") renderGaleriaMayores();
     if (btn.dataset.vista === "estadisticas") renderEstadisticas();
   });
 });
@@ -820,6 +821,105 @@ $("quiz-mini").addEventListener("click", () => {
   if (quizResuelto && quizActual) {
     abrirLightbox(imagenCarta(quizActual), nombreCarta(quizActual), quizVerInv);
   }
+});
+
+/* ============================================================
+   MODO MAYORES (🌙) — elegir un Arcano Mayor y estudiarlo a fondo.
+   Es lo contrario de Adivina: aquí tú eliges la carta y se abre
+   directamente su ficha "Conoce esta carta".
+   ============================================================ */
+let mayN = null;              // índice del mayor elegido (0..21), o null
+let mayInv = false;           // orientación mostrada (editable con Invertir)
+let mayDetalleAbierto = true; // la ficha arranca abierta (el objetivo es estudiar)
+let mayGaleriaLista = false;
+
+function cartaMayor(n) { return { id: `mayor-${n}`, tipo: "mayor", n }; }
+
+/* Construye la galería de los 22 mayores, agrupados por línea del viaje. */
+function renderGaleriaMayores() {
+  if (mayGaleriaLista) return;
+  const cont = $("may-galeria");
+  let html = "";
+  for (const linea of [0, 1, 2, 3]) {
+    const grupo = [];
+    for (let n = 0; n < MAYORES.length; n++) if (lineaMayor(n) === linea) grupo.push(n);
+    if (!grupo.length) continue;
+    html += `<h3 class="ref-linea">${LINEA_NOMBRE[linea]}</h3><div class="may-grid">`;
+    for (const n of grupo) {
+      html += `<button class="may-op" data-n="${n}">
+        <img src="${imagenCarta(cartaMayor(n))}" alt="${MAYORES[n].nombre}" loading="lazy" />
+        <span class="may-op-rom">${romanoMayor(n)}</span>
+        <span class="may-op-nom">${MAYORES[n].nombre}</span>
+      </button>`;
+    }
+    html += `</div>`;
+  }
+  cont.innerHTML = html;
+  cont.querySelectorAll(".may-op").forEach((b) =>
+    b.addEventListener("click", () => seleccionarMayor(parseInt(b.dataset.n, 10))));
+  mayGaleriaLista = true;
+}
+
+/* Marca el thumbnail activo en la galería. */
+function marcarGaleriaMayor() {
+  document.querySelectorAll("#may-galeria .may-op").forEach((b) =>
+    b.classList.toggle("activo", parseInt(b.dataset.n, 10) === mayN));
+}
+
+/* Pinta la carta elegida + su ficha en la orientación mayInv. */
+function pintarMayor() {
+  const carta = cartaMayor(mayN);
+  const img = $("may-img");
+  img.src = imagenCarta(carta);
+  img.alt = nombreCarta(carta);
+  img.classList.toggle("invertida", mayInv);
+  $("may-nombre").textContent = `${romanoMayor(mayN)} · ${nombreCarta(carta)}`;
+  $("may-badge").textContent = mayInv ? "⟳ Invertida" : "Derecha";
+  $("may-badge").classList.toggle("inv", mayInv);
+  $("may-invertir").textContent = mayInv ? "⟳ Ver al derecho" : "⟳ Invertir";
+  renderDetalle(carta, mayInv, "may-det-contenido", "may-det-links");
+  $("may-prev").disabled = mayN <= 0;
+  $("may-next").disabled = mayN >= MAYORES.length - 1;
+  marcarGaleriaMayor();
+}
+
+/* Elige un Arcano Mayor: muestra la carta y abre la ficha. */
+function seleccionarMayor(n) {
+  mayN = n;
+  mayInv = false;
+  pintarMayor();
+  $("may-elegida").classList.remove("oculto");
+  $("may-detalle").classList.remove("oculto");
+  mayDetalleAbierto = true;
+  $("may-detalle-cuerpo").classList.remove("oculto");
+  $("may-detalle-toggle").setAttribute("aria-expanded", "true");
+  asegurarVisible($("may-elegida"));
+  Sonido.voltear();
+}
+
+// Navegación por el viaje (anterior / siguiente)
+$("may-prev").addEventListener("click", () => { if (mayN !== null && mayN > 0) seleccionarMayor(mayN - 1); });
+$("may-next").addEventListener("click", () => { if (mayN !== null && mayN < MAYORES.length - 1) seleccionarMayor(mayN + 1); });
+
+// Invertir / revertir para estudiar ambos significados
+$("may-invertir").addEventListener("click", () => {
+  if (mayN === null) return;
+  mayInv = !mayInv;
+  pintarMayor();
+});
+
+// Tocar la carta la amplía a pantalla completa
+$("may-img").addEventListener("click", () => {
+  if (mayN === null) return;
+  const carta = cartaMayor(mayN);
+  abrirLightbox(imagenCarta(carta), nombreCarta(carta), mayInv);
+});
+
+// Desplegar / plegar la ficha
+$("may-detalle-toggle").addEventListener("click", () => {
+  mayDetalleAbierto = !mayDetalleAbierto;
+  $("may-detalle-cuerpo").classList.toggle("oculto", !mayDetalleAbierto);
+  $("may-detalle-toggle").setAttribute("aria-expanded", mayDetalleAbierto ? "true" : "false");
 });
 
 /* ============================================================

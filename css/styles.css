@@ -533,3 +533,46 @@ h2 { letter-spacing: 0.5px; }
   .stat-destacado { grid-template-columns: 1fr; }
   .stat-tile-pct { font-size: 1.7rem; }
 }
+
+/* ============================================================
+   MODO MAYORES (🌙 elegir un Arcano Mayor y estudiarlo)
+   ============================================================ */
+.may-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px; margin: 8px 0 4px;
+}
+.may-op {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--bg-panel-2); color: var(--texto);
+  border: 1px solid var(--borde); border-radius: 10px;
+  padding: 8px 6px; cursor: pointer; transition: all 0.12s;
+}
+.may-op img {
+  width: 100%; aspect-ratio: 150 / 264; object-fit: cover;
+  border-radius: 6px; border: 2px solid #d9c98a; box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+.may-op-rom { font-family: var(--fuente-titulo); font-size: 0.8rem; color: var(--acento-2); letter-spacing: 0.5px; }
+.may-op-nom { font-family: var(--fuente-titulo); font-size: 0.74rem; text-align: center; line-height: 1.2; color: var(--texto-tenue); }
+.may-op:hover { border-color: var(--acento); transform: translateY(-2px); }
+.may-op.activo { border-color: var(--oro); box-shadow: 0 0 14px rgba(233,207,130,0.35); }
+.may-op.activo .may-op-nom { color: var(--texto); }
+
+/* Carta elegida */
+.may-nav { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.may-nav .carta-nombre { flex: 1; margin-bottom: 0; }
+.may-flecha { font-size: 1.1rem; padding: 10px 14px; line-height: 1; }
+.may-flecha:disabled { opacity: 0.35; cursor: default; }
+.may-flecha:disabled:hover { border-color: var(--borde); }
+.may-carta-zona { display: flex; justify-content: center; margin: 4px 0 8px; }
+.may-img {
+  width: 180px; max-width: 70%; aspect-ratio: 150 / 264; object-fit: cover;
+  border-radius: 12px; border: 3px solid #d9c98a; cursor: zoom-in;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55), 0 0 22px rgba(233,207,130,0.25);
+  transition: transform 0.4s ease;
+}
+.may-img.invertida { transform: rotate(180deg); }
+
+@media (max-width: 380px) {
+  .may-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+  .may-op-nom { font-size: 0.68rem; }
+}

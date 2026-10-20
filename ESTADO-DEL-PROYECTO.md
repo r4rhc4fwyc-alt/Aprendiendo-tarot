@@ -95,6 +95,17 @@ y fichas narradas. En español, mobile-first, publicable en GitHub Pages. Ver
 21. **Flashcards — botón Invertir/Revertir** en la ficha "Conoce esta carta"
     (`fcVerInv` + `pintarReversoFC`): voltea imagen + síntesis + ficha + nombre entre
     derecho e invertido, para estudiar ambos significados (igual que Adivina).
+23. **Modo Mayores (🌙 Mayores)**: 7ª pestaña, "lo contrario de Adivina". Una
+    **galería** con los 22 Arcanos Mayores (miniatura + romano + nombre) agrupados por
+    las líneas del **viaje del Loco**; al **elegir** uno se muestra grande y se abre
+    directamente su ficha **"Conoce esta carta"** (esencia + escena + lectura +
+    correspondencias + particularidad). Incluye botón **Invertir/Revertir** para estudiar
+    ambos significados, **flechas Anterior/Siguiente** para recorrer el viaje (deshabilitadas
+    en los extremos; resetean la orientación) y **lightbox** al tocar la carta. Reutiliza
+    `renderDetalle`, `abrirLightbox`, `nombreCarta`, `imagenCarta` y los datos `MAYORES`
+    (`renderGaleriaMayores`, `seleccionarMayor`, `pintarMayor`). No registra estadísticas
+    (es modo de estudio, no de práctica).
+
 22. **Publicación**: la rama de trabajo se fusionó a `main` (fast-forward). GitHub
     Pages puede servir desde `main`; URL esperada
     `https://r4rhc4fwyc-alt.github.io/Aprendiendo-tarot/`. Se sigue desarrollando en
